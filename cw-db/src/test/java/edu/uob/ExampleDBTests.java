@@ -26,6 +26,7 @@ public class ExampleDBTests {
     @Test
     public void testCreatDataBase() {
         DataBase database = new DataBase("marks");
+        database.dropDatabase();
     }
 
     // Random name generator - useful for testing "bare earth" queries (i.e. where tables don't previously exist)
