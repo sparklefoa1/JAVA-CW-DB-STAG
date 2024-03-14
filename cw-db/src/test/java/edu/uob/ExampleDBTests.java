@@ -23,6 +23,10 @@ public class ExampleDBTests {
     public void testPrintOutFile(){
         server.printOutFile();
     }
+    @Test
+    public void testCreatDataBase() {
+        DataBase database = new DataBase("marks");
+    }
 
     // Random name generator - useful for testing "bare earth" queries (i.e. where tables don't previously exist)
     private String generateRandomName() {
