@@ -1,11 +1,6 @@
 package edu.uob;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Paths;
@@ -44,6 +39,21 @@ public class DBServer {
     public String handleCommand(String command) {
         // TODO implement your server logic here
         return "";
+    }
+
+    public void printOutFile() {
+        String filePath ="databases" + File.separator + "people.tab";
+        try {
+            FileReader reader = new FileReader(filePath);
+            BufferedReader bufferReader = new BufferedReader(reader);
+            String tableFile;
+            while ((tableFile = bufferReader.readLine()) != null) {
+                System.out.println(tableFile);
+            }
+            bufferReader.close();
+        } catch (IOException ioe) {
+            System.out.println("Can't read this file: " + filePath);
+        }
     }
 
     //  === Methods below handle networking aspects of the project - you will not need to change these ! ===
