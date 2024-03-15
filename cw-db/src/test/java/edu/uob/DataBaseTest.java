@@ -8,11 +8,14 @@ public class DataBaseTest {
     private String databaseName = "marks";
 
     @BeforeEach
-    public void setupDatabase() { database= new DataBase(databaseName); }
-
-    //@Test
-    //public void testCreateDatabase() { database.createDatabase(databaseName); }
+    public void setupDatabase() { database = new DataBase(); }
 
     @Test
-    public void testDropDatabase() { database.dropDatabase(); }
+    public void testCreateDatabase() {
+        database.createDatabase(databaseName);
+        database.dropDatabase();
+    }
+
+    //@Test
+    //public void testDropDatabase() { database.dropDatabase(); } individual environment, can't test each.
 }
