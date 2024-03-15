@@ -7,13 +7,13 @@ import java.nio.file.Paths;
 
 public class DataBase {
     private String storageFolderPath;
-    public DataBase(String DBname) {
-        storageFolderPath = Paths.get("databases" + File.separator + DBname).toAbsolutePath().toString();
+    public DataBase(String databaseName) {
+        storageFolderPath = Paths.get("databases" + File.separator + databaseName).toAbsolutePath().toString();
         try {
             // Create the database storage folder if it doesn't already exist !
             Files.createDirectories(Paths.get(storageFolderPath));
             System.out.println("[OK]");
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             System.out.println("Can't seem to create a database: " + storageFolderPath);
         }
     }
