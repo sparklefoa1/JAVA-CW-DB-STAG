@@ -8,7 +8,10 @@ public class DataBaseTest {
     private String databaseName = "marks";
 
     @BeforeEach
-    public void setDatabase() { database = new DataBase(databaseName); }
+    public void setupDatabase() { database= new DataBase(databaseName); }
+
+    //@Test
+    //public void testCreateDatabase() { database.createDatabase(databaseName); }
 
     @Test
     public void testDropDatabase() { database.dropDatabase(); }

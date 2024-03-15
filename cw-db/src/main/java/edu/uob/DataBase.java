@@ -12,19 +12,36 @@ public class DataBase {
         try {
             // Create the database storage folder if it doesn't already exist !
             Files.createDirectories(Paths.get(storageFolderPath));
+            PathManager.getPathInstance().setDatabaseFolderPath("databases" + File.separator + databaseName);
             System.out.println("[OK]");
         } catch (IOException ioe) {
             System.out.println("Can't seem to create a database: " + storageFolderPath);
         }
     }
 
-    public void dropDatabase() {
+    /*public void createDatabase(String databaseName) {
+        //storageFolderPath = Paths.get("databases" + File.separator + databaseName).toAbsolutePath().toString();
         try {
-            // Delete database folder
-            Files.deleteIfExists(Paths.get(storageFolderPath));
+            // Create the database storage folder if it doesn't already exist !
+            Files.createDirectories(Paths.get(storageFolderPath));
+            PathManager.getPathInstance().setDatabaseFolderPath("databases" + File.separator + databaseName);
             System.out.println("[OK]");
         } catch (IOException ioe) {
-            System.out.println("Failed to delete database folder: " + storageFolderPath);
+            System.out.println("Can't seem to create a database: " + storageFolderPath);
+        }
+    }*/
+
+    public void dropDatabase() {
+        if (storageFolderPath != null) {
+            try {
+                // Delete database folder
+                Files.deleteIfExists(Paths.get(storageFolderPath));
+                System.out.println("[OK]");
+            } catch (IOException ioe) {
+                System.out.println("Failed to delete database folder: " + storageFolderPath);
+            }
+        } else {
+            System.out.println("Database folder path is null.");
         }
     }
 }
