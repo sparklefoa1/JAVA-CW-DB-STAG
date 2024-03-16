@@ -14,7 +14,6 @@ public class DataBase {
         databaseName = databaseName.toLowerCase();
         // Construct database storage path.
         File database = new File("databases", databaseName);
-        this.databaseStoragePath = database.getAbsolutePath();
         try {
             // Create the database storage folder if it doesn't already exist.
             if (!database.exists()) {
@@ -24,7 +23,7 @@ public class DataBase {
             PathManager.getPathInstance().setDatabaseFolderPath(database.getPath());
             System.out.println("[OK]");
         } catch (SecurityException se) {
-            System.out.println("Can't seem to create a database: " + this.databaseStoragePath);
+            System.out.println("Can't seem to create a database: " + database.getPath());
         }
     }
 
@@ -33,7 +32,6 @@ public class DataBase {
         try {
             // Construct database storage path.
             File database = new File("databases", databaseName);
-            this.databaseStoragePath = database.getAbsolutePath();
             // Return if the database isn't exit.
             if (!database.exists()) {
                 System.out.println("database is not exist: " + databaseName);
@@ -43,7 +41,7 @@ public class DataBase {
             dropDatabase(database);
             System.out.println("[OK]");
         } catch (IOException ioe) {
-            System.out.println("Can't seem to drop the database: " + this.databaseStoragePath);
+            System.out.println("Can't seem to drop the database: " + "databases" + File.separator + databaseName);
         }
     }
 
@@ -58,7 +56,7 @@ public class DataBase {
             }
         }
         if (!database.delete()) {
-            throw new IOException("Can't seem to drop the database: " + this.databaseStoragePath);
+            throw new IOException("Can't seem to drop the database: " + database.getPath());
         }
     }
 }
