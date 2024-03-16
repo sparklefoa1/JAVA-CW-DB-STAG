@@ -6,14 +6,17 @@ import org.junit.jupiter.api.Test;
 public class DataBaseTest {
     private DataBase database;
     private String databaseName = "marks";
+    private Table table;
+    private String tableName = "marks";
 
     @BeforeEach
-    public void setupDatabase() { database = new DataBase(); }
+    public void setupDatabase() { database = new DataBase(); table = new Table();}
 
     @Test
     public void testCreateDatabase() {
         database.createDatabase(databaseName);
-        database.dropDatabase();
+        //table.createTable(tableName);
+        database.dropDatabase(databaseName);
     }
 
     //@Test

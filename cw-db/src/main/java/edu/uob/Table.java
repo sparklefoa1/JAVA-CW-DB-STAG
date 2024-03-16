@@ -6,15 +6,17 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class Table {
-    private String storageFolderPath;
-    public Table(String tableName) {
-        storageFolderPath = Paths.get("databases" + File.separator + tableName).toAbsolutePath().toString();
-        try {
-            // Create the database storage folder if it doesn't already exist !
-            Files.createDirectories(Paths.get(storageFolderPath));
+    private String tableStoragePath;
+
+    public void createTable(String tableName) {
+        tableStoragePath = PathManager.getPathInstance().getDatabaseFolderPath();
+        System.out.println(tableStoragePath);
+       try {
+            // Create the table file
+            Files.createFile(Paths.get(tableStoragePath, tableName + ".tab"));
             System.out.println("[OK]");
         } catch(IOException ioe) {
-            System.out.println("Can't seem to create a database: " + storageFolderPath);
+            System.out.println("Can't seem to create a table: " + tableStoragePath);
         }
     }
 }
