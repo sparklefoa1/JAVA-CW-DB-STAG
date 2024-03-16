@@ -10,7 +10,6 @@ public class Table {
 
     public void createTable(String tableName) {
         tableStoragePath = PathManager.getPathInstance().getDatabaseFolderPath();
-        System.out.println(tableStoragePath);
        try {
             // Create the table file
             Files.createFile(Paths.get(tableStoragePath, tableName + ".tab"));
@@ -18,5 +17,9 @@ public class Table {
         } catch(IOException ioe) {
             System.out.println("Can't seem to create a table: " + tableStoragePath);
         }
+    }
+
+    public void dropTable(String tableName) {
+
     }
 }

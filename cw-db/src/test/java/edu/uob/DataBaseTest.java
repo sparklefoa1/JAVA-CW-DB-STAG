@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 public class DataBaseTest {
     private DataBase database;
-    private String databaseName = "marks";
+    private String databaseName = "Marks";
     private Table table;
     private String tableName = "marks";
 
@@ -15,7 +15,7 @@ public class DataBaseTest {
     @Test
     public void testCreateDatabase() {
         database.createDatabase(databaseName);
-        //table.createTable(tableName);
+        //table.createTable(tableName);//repeate create cant susseful
         database.dropDatabase(databaseName);
     }
 

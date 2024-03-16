@@ -7,57 +7,39 @@ import java.nio.file.Paths;
 
 public class DataBase {
     private String databaseStoragePath;
-    //private String currentDatabase;
 
-    public DataBase() {
-
-    }
+    public DataBase() {}
 
     public void createDatabase(String databaseName) {
+        databaseName = databaseName.toLowerCase();
         // Construct database storage path.
         File database = new File("databases", databaseName);
         this.databaseStoragePath = database.getAbsolutePath();
         try {
-            // If database storage folder does not exist, then create it.
+            // Create the database storage folder if it doesn't already exist.
             if (!database.exists()) {
                 database.mkdirs();
             }
             // Set "global" database folder path.
             PathManager.getPathInstance().setDatabaseFolderPath(database.getPath());
-            // Record current working database.
-            //currentDatabase = PathManager.getPathInstance().getDatabaseFolderPath();
             System.out.println("[OK]");
         } catch (SecurityException se) {
             System.out.println("Can't seem to create a database: " + this.databaseStoragePath);
         }
-
-        /*this.databaseStoragePath = Paths.get("databases" + File.separator + databaseName).toAbsolutePath().toString();
-        try {
-            // Create the database storage folder if it doesn't already exist !
-            Files.createDirectories(Paths.get(this.databaseStoragePath));
-            // Set "global database folder path"
-            PathManager.getPathInstance().setDatabaseFolderPath("databases" + File.separator + databaseName);
-            // Record current working database.
-            currentDatabase = PathManager.getPathInstance().getDatabaseFolderPath();
-            System.out.println("[OK]");
-        } catch (IOException ioe) {
-            System.out.println("Can't seem to create a database: " + this.databaseStoragePath);
-        }*/
     }
 
     public void dropDatabase(String databaseName) {
+        databaseName = databaseName.toLowerCase();
         try {
             // Construct database storage path.
             File database = new File("databases", databaseName);
             this.databaseStoragePath = database.getAbsolutePath();
-
-            // 如果文件夹不存在，则直接返回
+            // Return if the database isn't exit.
             if (!database.exists()) {
                 System.out.println("database is not exist: " + databaseName);
                 return;
             }
-
-            // 递归删除文件夹及其内容
+            // Recursively delete database and its contents.
             dropDatabase(database);
             System.out.println("[OK]");
         } catch (IOException ioe) {
@@ -67,10 +49,11 @@ public class DataBase {
 
     private void dropDatabase(File database) throws IOException {
         if (database.isDirectory()) {
-            File[] files = database.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    dropDatabase(file); // 递归删除子文件夹和文件
+            File[] tables = database.listFiles();
+            if (tables != null) {
+                // Loop to delete tables in database.
+                for (File table : tables) {
+                    dropDatabase(table);
                 }
             }
         }
@@ -78,15 +61,4 @@ public class DataBase {
             throw new IOException("Can't seem to drop the database: " + this.databaseStoragePath);
         }
     }
-        /*if (databaseStoragePath != null) {
-            try {
-                // Delete database folder
-                Files.deleteIfExists(Paths.get(currentDatabase));
-                System.out.println("[OK]");
-            } catch (IOException ioe) {
-                System.out.println("Failed to delete database folder: " + databaseStoragePath);
-            }
-        } else {
-            System.out.println("Database folder path is null.");
-        }*/
 }
