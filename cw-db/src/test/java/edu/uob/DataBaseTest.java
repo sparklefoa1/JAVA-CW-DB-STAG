@@ -15,8 +15,8 @@ public class DataBaseTest {
     @Test
     public void testCreateDatabase() {
         database.createDatabase(databaseName);
-        //table.createTable(tableName);//repeate create cant susseful
-        database.dropDatabase(databaseName);
+        table.createTable(tableName);//repeate create cant susseful
+        //database.dropDatabase(databaseName);
     }
 
     //@Test

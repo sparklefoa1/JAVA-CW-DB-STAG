@@ -2,11 +2,9 @@ package edu.uob;
 
 import java.io.*;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class DataBase {
-    private String databaseStoragePath;
+    //private String databaseStoragePath;
 
     public DataBase() {}
 
@@ -18,10 +16,10 @@ public class DataBase {
             // Create the database storage folder if it doesn't already exist.
             if (!database.exists()) {
                 database.mkdirs();
+                // Set "global" database folder path.
+                PathManager.getPathInstance().setDatabaseStoragePath(database.getPath());
+                System.out.println("[OK]");
             }
-            // Set "global" database folder path.
-            PathManager.getPathInstance().setDatabaseFolderPath(database.getPath());
-            System.out.println("[OK]");
         } catch (SecurityException se) {
             System.out.println("Can't seem to create a database: " + database.getPath());
         }

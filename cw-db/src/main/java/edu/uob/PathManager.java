@@ -2,7 +2,8 @@ package edu.uob;
 
 public class PathManager {
     private static PathManager pathInstance;
-    private String databaseFolderPath;
+    private String databaseStoragePath;
+    private String tableStoragePath;
 
     private PathManager() {
         // Make sure that only one PathManager instance exists throughout the entire package.
@@ -15,8 +16,11 @@ public class PathManager {
         return pathInstance;
     }
 
-    public void setDatabaseFolderPath(String folderPath) { this.databaseFolderPath = folderPath; System.out.println(folderPath);}
+    public void setDatabaseStoragePath(String folderPath) { this.databaseStoragePath = folderPath;}
 
-    public String getDatabaseFolderPath() { return databaseFolderPath; }
+    public String getDatabaseStoragePath() { return databaseStoragePath; }
+    public void setTableStoragePath(String folderPath) { this.tableStoragePath = folderPath;}
+
+    public String getTableStoragePath() { return tableStoragePath; }
 }
 
