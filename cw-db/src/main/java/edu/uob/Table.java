@@ -20,11 +20,11 @@ public class Table {
         System.out.println(this.currentDatabase);
        try {
             // Create the table file
-           //if (!table.exists()) {
+           if (!(currentDatabase == null)) {
                Files.createFile(Paths.get(this.currentDatabase, tableName + ".tab"));
                PathManager.getPathInstance().setTableStoragePath(table.getPath());
                System.out.println("[OK]");
-           //}
+           }
        } catch (FileAlreadyExistsException e) {
            System.out.println("Table already exists: " + this.currentDatabase);
        } catch(IOException ioe) {
@@ -34,12 +34,14 @@ public class Table {
 
     public void dropTable(String tableName) {
         tableName = tableName.toLowerCase();
+        currentDatabase = PathManager.getPathInstance().getDatabaseStoragePath();
         try {
             // Construct table storage path.
-            File table = new File(currentDatabase, tableName);//what is the difference of this.currentDatabase with currentDatabase
+            File table = new File(currentDatabase, tableName + ".tab");//what is the difference of this.currentDatabase with currentDatabase
+            System.out.println(currentDatabase);
             // Return if the table isn't exit.
             if (!table.exists()) {
-                System.out.println("table is not exist: " + tableName);
+                System.out.println("table is not exist: " + tableName + ".tab");
                 return;
             }
             // Recursively delete table and its contents.
@@ -51,9 +53,6 @@ public class Table {
     }
 
     private void dropTable(File table) throws IOException {
-        if (table != null) {
-            table.delete();
-        }
         if (!table.delete()) {
             throw new IOException("Can't seem to drop the database: " + table.getPath());
         }
