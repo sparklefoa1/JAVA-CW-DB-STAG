@@ -26,14 +26,36 @@ public class Table {
                System.out.println("[OK]");
            //}
        } catch (FileAlreadyExistsException e) {
-           //
            System.out.println("Table already exists: " + this.currentDatabase);
        } catch(IOException ioe) {
            System.out.println("Can't seem to create a table: " + this.currentDatabase);
        }
     }
 
-    //public void dropTable(String tableName) {
+    public void dropTable(String tableName) {
+        tableName = tableName.toLowerCase();
+        try {
+            // Construct table storage path.
+            File table = new File(currentDatabase, tableName);//what is the difference of this.currentDatabase with currentDatabase
+            // Return if the table isn't exit.
+            if (!table.exists()) {
+                System.out.println("table is not exist: " + tableName);
+                return;
+            }
+            // Recursively delete table and its contents.
+            dropTable(table);
+            System.out.println("[OK]");
+        } catch (IOException ioe) {
+            System.out.println("Can't seem to drop the table: " + currentDatabase + File.separator + tableName);
+        }
+    }
 
-    //}
+    private void dropTable(File table) throws IOException {
+        if (table != null) {
+            table.delete();
+        }
+        if (!table.delete()) {
+            throw new IOException("Can't seem to drop the database: " + table.getPath());
+        }
+    }
 }

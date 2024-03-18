@@ -16,7 +16,7 @@ public class PathManager {
         return pathInstance;
     }
 
-    public void setDatabaseStoragePath(String folderPath) { this.databaseStoragePath = folderPath; System.out.println(this.databaseStoragePath);}
+    public void setDatabaseStoragePath(String folderPath) { this.databaseStoragePath = folderPath; }
 
     public String getDatabaseStoragePath() { return databaseStoragePath; }
     public void setTableStoragePath(String folderPath) { this.tableStoragePath = folderPath;}
