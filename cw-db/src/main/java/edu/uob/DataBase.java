@@ -16,10 +16,10 @@ public class DataBase {
             // Create the database storage folder if it doesn't already exist.
             if (!database.exists()) {
                 database.mkdirs();
-                // Set "global" database folder path.
-                PathManager.getPathInstance().setDatabaseStoragePath(database.getPath());
                 System.out.println("[OK]");
             }
+            // Set "global" database folder path.
+            PathManager.getPathInstance().setDatabaseStoragePath(database.getPath());
         } catch (SecurityException se) {
             System.out.println("Can't seem to create a database: " + database.getPath());
         }

@@ -14,22 +14,22 @@ public class Table {
 
     public void createTable(String tableName) {
         tableName = tableName.toLowerCase();
-        currentDatabase = PathManager.getPathInstance().getDatabaseStoragePath();
-        File table = new File(currentDatabase, tableName);
+        this.currentDatabase = PathManager.getPathInstance().getDatabaseStoragePath();
+        File table = new File(this.currentDatabase, tableName);
         //this.tableStoragePath = table.getPath();
-        //System.out.println(this.currentDatabase);
+        System.out.println(this.currentDatabase);
        try {
             // Create the table file
-           if (!table.exists()) {
-               Files.createFile(Paths.get(currentDatabase, tableName + ".tab"));
+           //if (!table.exists()) {
+               Files.createFile(Paths.get(this.currentDatabase, tableName + ".tab"));
                PathManager.getPathInstance().setTableStoragePath(table.getPath());
                System.out.println("[OK]");
-           }
+           //}
        } catch (FileAlreadyExistsException e) {
            //
-           System.out.println("Table already exists: " + currentDatabase);
+           System.out.println("Table already exists: " + this.currentDatabase);
        } catch(IOException ioe) {
-            System.out.println("Can't seem to create a table: " + currentDatabase);
+           System.out.println("Can't seem to create a table: " + this.currentDatabase);
        }
     }
 

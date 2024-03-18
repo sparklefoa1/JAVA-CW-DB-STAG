@@ -15,7 +15,7 @@ public class DataBaseTest {
     @Test
     public void testCreateDatabase() {
         database.createDatabase(databaseName);
-        table.createTable(tableName);//repeate create cant susseful
+        table.createTable(tableName);//repeate create cant susseful, need to fix when the db path is null
         //database.dropDatabase(databaseName);
     }
 
