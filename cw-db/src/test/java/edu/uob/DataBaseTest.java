@@ -8,17 +8,26 @@ public class DataBaseTest {
     private String databaseName = "Marks";
     private Table table;
     private String tableName = "marks";
+    private Insertion contentTest;
+    private String[] titleRow = {"id", "name", "mark", "pass"};
+    private  String contentToDelete = "id";
 
     @BeforeEach
-    public void setupDatabase() { database = new DataBase(); table = new Table();}
+    public void setupDatabase() {
+        database = new DataBase();
+        table = new Table();
+        contentTest = new Insertion();
+    }
 
     @Test
     public void testCreateDatabase() {
         database.createDatabase(databaseName);
         table.createTable(tableName);
-        //table.printOutFile();
-        //table.dropTable(tableName);
-        //database.dropDatabase(databaseName);
+        table.printOutFile();
+        contentTest.insertContent(titleRow);//second will in the same line
+        contentTest.deleteContent(contentToDelete);
+        table.dropTable(tableName);
+        database.dropDatabase(databaseName);
     }
 
     //@Test
