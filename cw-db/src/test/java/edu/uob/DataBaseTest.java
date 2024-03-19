@@ -16,6 +16,7 @@ public class DataBaseTest {
     public void testCreateDatabase() {
         database.createDatabase(databaseName);
         table.createTable(tableName);
+        //table.printOutFile();
         //table.dropTable(tableName);
         //database.dropDatabase(databaseName);
     }

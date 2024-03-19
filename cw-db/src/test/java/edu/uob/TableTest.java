@@ -5,12 +5,13 @@ import org.junit.jupiter.api.Test;
 
 public class TableTest {
     private Table table;
-    private Row printTest;
+    private Insertion printTest;
     private String tableName = "marks";
     private String[] titleRow = {"id", "name", "mark", "pass"};
+    private  String contentToDelete = "id";
 
     @BeforeEach
-    public void setupTable() { table = new Table(); printTest = new Row();}
+    public void setupTable() { table = new Table(); printTest = new Insertion();}
 
     @Test
     public void createTable() {table.createTable(tableName);}
@@ -18,7 +19,7 @@ public class TableTest {
     // Check if the spreadsheet file can be read and printed normally.
     @Test
     public void testPrintOutFile(){
-        printTest.printOutFile();
-        printTest.insertRow(titleRow);
+        //printTest.insertContent(titleRow);//second will in the same line
+        printTest.deleteContent(contentToDelete);
     }
 }
