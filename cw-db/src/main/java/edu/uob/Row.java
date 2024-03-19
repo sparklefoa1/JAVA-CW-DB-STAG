@@ -7,16 +7,19 @@ public class Row {
     public Row() {}
 
     public void insertRow(String[] contentRow) {
-        //String currentTable = PathManager.getPathInstance().getTableStoragePath();
-        String currentTable = "databases" + File.separator + "marks" + File.separator + "marks.tab";
-        try {
-            FileWriter titleRow = new FileWriter(currentTable);
-            titleRow.write(contentRow[0]);
-            for (int i = 1; i < contentRow.length; i++) {
-                titleRow.write("\t" + contentRow[i]);
+        String currentTable = PathManager.getPathInstance().getTableStoragePath();//if this is null?
+        //String currentTable = "databases" + File.separator + "marks" + File.separator + "marks.tab";
+        if (currentTable == null) {
+            System.err.println("The tablePath is null.");
+            return;
+        }
+        try (BufferedWriter insertLine = new BufferedWriter(new FileWriter(currentTable, true))) {
+            for (String valueContent : contentRow) {
+                // Use Unicode characters to represent tab characters.
+                insertLine.write(valueContent + "\u0009");
             }
-            //titleRow.newLine(); need Bufferwritter method
-            titleRow.close();
+            insertLine.close();
+            System.out.println("[OK]");
         } catch (IOException ioe) {
             System.out.println("Can't insert the title row: " + currentTable);
         }
