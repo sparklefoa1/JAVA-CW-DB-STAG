@@ -2,11 +2,11 @@ package edu.uob;
 
 import java.io.*;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Insertion {
 
     public Insertion() {}
-
     public void insertContent(String[] contentValue) {
         //String currentTable = PathManager.getPathInstance().getTableStoragePath();
         String currentTable = "databases" + File.separator + "marks" + File.separator + "marks.tab";
@@ -19,6 +19,7 @@ public class Insertion {
                 // Use Unicode characters to represent tab characters.
                 insertValue.write(singleContent + "\u0009");
             }
+            insertValue.newLine();
             insertValue.close();//still need?
             System.out.println("[OK]");
         } catch (IOException ioe) {
