@@ -16,8 +16,7 @@ public class Table {
         tableName = tableName.toLowerCase();
         this.currentDatabase = PathManager.getPathInstance().getDatabaseStoragePath();
         File table = new File(this.currentDatabase, tableName);
-        //this.tableStoragePath = table.getPath();
-        System.out.println(this.currentDatabase);
+        //System.out.println(this.currentDatabase);
        try {
             // Create the table file
            if (!(currentDatabase == null)) {
@@ -38,7 +37,7 @@ public class Table {
         try {
             // Construct table storage path.
             File table = new File(currentDatabase, tableName + ".tab");//what is the difference of this.currentDatabase with currentDatabase
-            System.out.println(currentDatabase);
+            //System.out.println(currentDatabase);
             // Return if the table isn't exit.
             if (!table.exists()) {
                 System.out.println("table is not exist: " + tableName + ".tab");

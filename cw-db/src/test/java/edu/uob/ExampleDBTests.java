@@ -18,12 +18,6 @@ public class ExampleDBTests {
         server = new DBServer();
     }
 
-    // Check if the spreadsheet file can be read and printed normally.
-    @Test
-    public void testPrintOutFile(){
-        server.printOutFile();
-    }
-
     // Random name generator - useful for testing "bare earth" queries (i.e. where tables don't previously exist)
     private String generateRandomName() {
         String randomName = "";

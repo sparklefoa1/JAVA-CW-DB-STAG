@@ -41,21 +41,6 @@ public class DBServer {
         return "";
     }
 
-    public void printOutFile() {
-        String filePath ="databases" + File.separator + "people.tab";
-        try {
-            FileReader reader = new FileReader(filePath);
-            BufferedReader bufferReader = new BufferedReader(reader);
-            String tableFile;
-            while ((tableFile = bufferReader.readLine()) != null) {
-                System.out.println(tableFile);
-            }
-            bufferReader.close();
-        } catch (IOException ioe) {
-            System.out.println("Can't read this file: " + filePath);
-        }
-    }
-
     //  === Methods below handle networking aspects of the project - you will not need to change these ! ===
 
     public void blockingListenOn(int portNumber) throws IOException {
