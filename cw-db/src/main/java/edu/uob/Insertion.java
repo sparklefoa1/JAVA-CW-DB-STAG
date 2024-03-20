@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 public class Insertion {
 
-    public Insertion() {}
     public void insertContent(String[] contentValue) {
         //String currentTable = PathManager.getPathInstance().getTableStoragePath();
         String currentTable = "databases" + File.separator + "marks" + File.separator + "marks.tab";

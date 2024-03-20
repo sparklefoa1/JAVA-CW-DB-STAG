@@ -24,7 +24,9 @@ public class DataBaseTest {
 
     @Test
     public void testCreateDatabase() {
-        TableModification.modifyTable("databases" + File.separator + "people.tab", "Name", "Bob", "Age", "31");
+        //TableModification.addNewHeader("databases" + File.separator + "people.tab", "add");
+        //TableModification.modifyTable("databases" + File.separator + "people.tab", "Name", "Chris", "test", "21");
+        TableModification.dropColumn("databases" + File.separator + "people.tab", "add");
         //database.createDatabase(databaseName);
         //table.createTable(tableName);
         //table.printOutFile();

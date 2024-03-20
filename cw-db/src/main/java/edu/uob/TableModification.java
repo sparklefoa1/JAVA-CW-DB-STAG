@@ -2,10 +2,12 @@ package edu.uob;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class TableModification {
 
+    // Modify or add a value to the table.
     public static void modifyTable(String currentTable, String indirectColumnName, String indexValue, String directColumnName, String valueToModify) {
         try {
             List<String> lines = readFile(currentTable);
@@ -19,9 +21,12 @@ public class TableModification {
                 for (int i = 1; i < lines.size(); i++) {
                     String currentLine = lines.get(i);
                     String[] tokens = currentLine.split("\t");
-                    // Prevent array index from going out of bounds.
                     // Modify and update the table.
-                    if (tokens.length > basedColumnIndex && tokens.length > modifyColumnIndex && tokens[basedColumnIndex].equals(indexValue)) {
+                    if (tokens[basedColumnIndex].equals(indexValue)) {
+                        while (tokens.length <= modifyColumnIndex) {
+                            currentLine += "\t "; // Add tab&space to create empty field.
+                            tokens = currentLine.split("\t"); // Update tokens.
+                        }
                         tokens[modifyColumnIndex] = String.valueOf(valueToModify);
                         lines.set(i, String.join("\t", tokens));
                         break;
@@ -35,6 +40,53 @@ public class TableModification {
             ioe.printStackTrace();
         }
     }
+
+    // Add a new header to the end.
+    public static void addNewHeader(String currentTable, String headerName) {
+        try {
+            List<String> lines = readFile(currentTable);
+
+            // Add the new header name to the end of the header line.
+            String headerLine = lines.get(0);
+            headerLine += "\t" + headerName;
+            lines.set(0, headerLine);
+
+            writeFile(currentTable, lines);
+            System.out.println("New column " + headerName + " has been added.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Drop a column form the table.
+    public static void dropColumn(String currentTable, String headerName) {
+        try {
+            List<String> lines = readFile(currentTable);
+
+            int columnIndex = getColumnIndex(lines.get(0), headerName);
+
+            if (columnIndex != -1) {
+                for (int i = 0; i < lines.size(); i++) {
+                    String currentLine = lines.get(i);
+                    String[] tokens = currentLine.split("\t");
+                    // Delete the value at the special column index.
+                    if (tokens.length > columnIndex) {
+                        List<String> updatedTokens = new ArrayList<>(Arrays.asList(tokens));
+                        updatedTokens.remove(columnIndex);
+                        lines.set(i, String.join("\t", updatedTokens));
+                    }
+                }
+
+                writeFile(currentTable, lines);
+                System.out.println("[OK]");
+            } else {
+                System.out.println("Column " + headerName + " not found.");
+            }
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
+
 
     private static int getColumnIndex(String headerLine, String columnName) {
         String[] header = headerLine.split("\t");
