@@ -17,7 +17,7 @@ public class Insertion {
         try (BufferedWriter insertValue = new BufferedWriter(new FileWriter(currentTable, true))) {
             for (String singleContent : contentValue) {
                 // Use Unicode characters to represent tab characters.
-                insertValue.write(singleContent + "\u0009");
+                insertValue.write(singleContent + "\t");
             }
             insertValue.newLine();
             insertValue.close();//still need?
