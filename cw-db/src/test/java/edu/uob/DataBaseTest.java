@@ -3,6 +3,7 @@ package edu.uob;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class DataBaseTest {
@@ -23,10 +24,11 @@ public class DataBaseTest {
 
     @Test
     public void testCreateDatabase() {
-        database.createDatabase(databaseName);
-        table.createTable(tableName);
+        TableModification.modifyTable("databases" + File.separator + "people.tab", "Name", "Bob", "Age", "31");
+        //database.createDatabase(databaseName);
+        //table.createTable(tableName);
         //table.printOutFile();
-        contentTest.insertContent(titleRow);//second will in the same line
+        //contentTest.insertContent(titleRow);//second will in the same line
         //contentTest.deleteContent(contentToDelete);
         //table.dropTable(tableName);
         //database.dropDatabase(databaseName);
