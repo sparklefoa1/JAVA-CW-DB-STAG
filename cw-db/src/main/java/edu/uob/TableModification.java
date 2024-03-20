@@ -7,6 +7,37 @@ import java.util.List;
 
 public class TableModification {
 
+    // Insert content line to the table.
+    public static void insertContentLine(String currentTable, String[] contentLine) {
+        if (currentTable == null) {
+            System.err.println("The tablePath is null.");
+            return;
+        }
+        try {
+            List<String> lines = readFile(currentTable);
+            int rowIndex;
+            if (lines.isEmpty()) {
+                // Insert at the beginning when the table is empty.
+                rowIndex = 0;
+            } else {
+                // Insert at the end when the table is not empty.
+                rowIndex = lines.size();
+            }
+
+            StringBuilder newLine = new StringBuilder();
+            for (String singleContent : contentLine) {
+                newLine.append(singleContent).append("\t");
+            }
+
+            lines.add(rowIndex, newLine.toString());
+
+            writeFile(currentTable, lines);
+            System.out.println("[OK]");
+        } catch (IOException ioe) {
+            System.out.println("Can't insert the content: " + ioe.getMessage());
+        }
+    }
+
     // Modify or add a value to the table.
     public static void modifyTable(String currentTable, String indirectColumnName, String indexValue, String directColumnName, String valueToModify) {
         try {
@@ -52,9 +83,36 @@ public class TableModification {
             lines.set(0, headerLine);
 
             writeFile(currentTable, lines);
-            System.out.println("New column " + headerName + " has been added.");
+            System.out.println("[OK]");
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    // Drop a line from the table.
+    public static void dropRow(String currentTable, String directColumnName, String indexValue) {
+        try {
+            List<String> lines = readFile(currentTable);
+
+            int columnIndex = getColumnIndex(lines.get(0), directColumnName);
+
+            if (columnIndex != -1) {
+                for (int i = 1; i < lines.size(); i++) {
+                    String currentLine = lines.get(i);
+                    String[] tokens = currentLine.split("\t");
+                    if (tokens.length > columnIndex && tokens[columnIndex].equals(indexValue)) {
+                        lines.remove(i);
+                        i--; // Adjust index because we removed a line
+                    }
+                }
+
+                writeFile(currentTable, lines);
+                System.out.println("[OK]");
+            } else {
+                throw new IllegalArgumentException("Column " + directColumnName + " not found.");
+            }
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
         }
     }
 

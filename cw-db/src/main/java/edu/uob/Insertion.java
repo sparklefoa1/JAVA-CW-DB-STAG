@@ -6,9 +6,7 @@ import java.util.ArrayList;
 
 public class Insertion {
 
-    public void insertContent(String[] contentValue) {
-        //String currentTable = PathManager.getPathInstance().getTableStoragePath();
-        String currentTable = "databases" + File.separator + "marks" + File.separator + "marks.tab";
+    public static void insertContent(String currentTable, String[] contentValue) {
         if (currentTable == null) {
             System.err.println("The tablePath is null.");
             return;
@@ -26,7 +24,7 @@ public class Insertion {
         }
     }
 
-    public void deleteContent(String contentToDelete) {
+    public static void deleteContent(String contentToDelete) {
         //String currentTable = PathManager.getPathInstance().getTableStoragePath();
         String currentTable = "databases" + File.separator + "marks" + File.separator + "marks.tab";
         if (currentTable == null) {
