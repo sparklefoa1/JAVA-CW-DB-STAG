@@ -6,55 +6,65 @@ import java.util.List;
 
 public class TableModification {
 
-    public void findPosition(String columnToModify) {//或者叫title什么什么?
-        // 解析表头，确定要修改的列的索引
-        String[] header = lines.get(0).split("\t");
-        int columnIndex = -1;
-        for (int i = 0; i < header.length; i++) {
-            if (header[i].equals(columnToModify)) {
-                columnIndex = i;
-                break;
-            }
-        }
-    }
-    public void modifyTable(String currentTable, String contentToFind, String contentToModify) {
+    public static void modifyTable(String currentTable, String indirectColumnName, String indexValue, String directColumnName, String valueToModify) {
         try {
-            // Read table contents and store in list.
-            List<String> lines = new ArrayList<>();
-            BufferedReader reader = new BufferedReader(new FileReader(currentTable));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                lines.add(line);
-            }
-            reader.close();
+            List<String> lines = readFile(currentTable);
 
-            // 在列表中搜索指定名称，并修改 mark 值
-            boolean found = false;
-            for (int i = 0; i < lines.size(); i++) {
-                String[] parts = lines.get(i).split("\t");
-                // 用方法找到要修改的行
-                if (parts.length >= 4 && parts[1].equals(contentToFind)) {
-                    parts[2] = String.valueOf(contentToModify);
-                    lines.set(i, String.join("\t", parts));
-                    found = true;
-                    break;
+            // Analyse the table header and indirectly find the index of the column to be modified.
+            int basedColumnIndex = getColumnIndex(lines.get(0), indirectColumnName); // Indirect index the value to be modified.
+            int modifyColumnIndex = getColumnIndex(lines.get(0), directColumnName); // Direct index the value to be modified.
+
+            // Find the position of the value needs to be modified.
+            if (basedColumnIndex != -1 && modifyColumnIndex != -1) {
+                for (int i = 1; i < lines.size(); i++) {
+                    String currentLine = lines.get(i);
+                    String[] tokens = currentLine.split("\t");
+                    // Prevent array index from going out of bounds.
+                    // Modify and update the table.
+                    if (tokens.length > basedColumnIndex && tokens.length > modifyColumnIndex && tokens[basedColumnIndex].equals(indexValue)) {
+                        tokens[modifyColumnIndex] = String.valueOf(valueToModify);
+                        lines.set(i, String.join("\t", tokens));
+                        break;
+                    }
                 }
             }
 
-            // 如果找到了指定名称，则写回文件
-            if (found) {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(currentTable));
-                for (String updatedLine : lines) {
-                    writer.write(updatedLine);
-                    writer.newLine();
-                }
-                writer.close();
-                System.out.println("Mark for " + contentToFind + " has been updated to " + contentToModify);
-            } else {
-                System.out.println("Name not found: " + contentToFind);
-            }
+            writeFile(currentTable, lines);
+            System.out.println("[OK]");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
     }
+
+    private static int getColumnIndex(String headerLine, String columnName) {
+        String[] header = headerLine.split("\t");
+        for (int i = 0; i < header.length; i++) {
+            if (header[i].equals(columnName)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static List<String> readFile(String currentTable) throws IOException {
+        List<String> lines = new ArrayList<>();
+        BufferedReader reader = new BufferedReader(new FileReader(currentTable));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            lines.add(line);
+        }
+        reader.close();
+        return lines;
+    }
+
+    private static void writeFile(String currentTable, List<String> lines) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(currentTable));
+        for (String updatedLine : lines) {
+            writer.write(updatedLine);
+            writer.newLine();
+        }
+        writer.close();
+    }
+
+
 }
