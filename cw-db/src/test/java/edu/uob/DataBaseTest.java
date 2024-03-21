@@ -35,6 +35,7 @@ public class DataBaseTest {
         TableModification.insertContentLine(table, insertRow);
         TableModification.addNewHeader(table, "testTitle");
         TableModification.modifyTable(table, "name", "Bob", "testTitle", "1");
+        TablePrinter.printOUtLine(table, "mark", "21");
         //TableModification.dropRow(table, "name", "Bob");
         //TableModification.dropColumn(table, "pass");
         //contentTest.deleteContent(contentToDelete);
