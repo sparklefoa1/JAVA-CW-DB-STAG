@@ -10,7 +10,7 @@ public class TableModification {
     // Insert content line to the table.
     public static void insertContentLine(String currentTable, String[] contentLine) {
         if (currentTable == null) {
-            System.err.println("The tablePath is null.");
+            System.err.println("The table is null.");
             return;
         }
         try {

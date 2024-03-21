@@ -4,22 +4,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.FileAlreadyExistsException;
 
-public class Table {
-    private DataBase currentDatabase;
-    private String storagePath;
+public class Tpath {
+    private String currentDatabase;
     private int id;
 
-    public void setStoragePath(String storagePath) {
-        this.storagePath = storagePath;
-    }
-
-    public String getStoragePath() {
-        return storagePath;
-    }
     public void setId(int id) {
         this.id = id;
     }
@@ -30,28 +22,27 @@ public class Table {
 
     public void createTable(String tableName) {
         tableName = tableName.toLowerCase();
-        currentDatabase = GlobalObject.getInstance().getDatabase();
-        setStoragePath(GlobalObject.getInstance().getDatabase().getStoragePath() + File.separator + tableName);
-        File table = new File(getStoragePath());
-        try {
+        currentDatabase = PathManager.getPathInstance().getDatabaseStoragePath();
+        File table = new File(currentDatabase, tableName);
+       try {
             // Create the table file
-            if (!(currentDatabase == null)) {
-                Files.createFile(Paths.get(getStoragePath() + ".tab"));
-                GlobalObject.getInstance().setTable(this);
-                System.out.println("[OK]");
-            }
-        } catch (FileAlreadyExistsException e) {
-            System.out.println("Table already exists: " + currentDatabase);
-        } catch(IOException ioe) {
-            System.out.println("Can't seem to create a table: " + currentDatabase);
-        }
+           if (!(currentDatabase == null)) {
+               Files.createFile(Paths.get(currentDatabase, tableName + ".tab"));
+               PathManager.getPathInstance().setTableStoragePath(table.getPath());
+               System.out.println("[OK]");
+           }
+       } catch (FileAlreadyExistsException e) {
+           System.out.println("Table already exists: " + currentDatabase);
+       } catch(IOException ioe) {
+           System.out.println("Can't seem to create a table: " + currentDatabase);
+       }
     }
 
     public void dropTable(String tableName) {
         tableName = tableName.toLowerCase();
-        //currentDatabase = PathManager.getPathInstance().getDatabaseStoragePath();
+        currentDatabase = PathManager.getPathInstance().getDatabaseStoragePath();
         try {
-            File table = new File(getStoragePath() + ".tab");
+            File table = new File(currentDatabase, tableName + ".tab");//what is the difference of this.currentDatabase with currentDatabase
             // Return if the table isn't exit.
             if (!table.exists()) {
                 System.out.println("table is not exist: " + tableName + ".tab");

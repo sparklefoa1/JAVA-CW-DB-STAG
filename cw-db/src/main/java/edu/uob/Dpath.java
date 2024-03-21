@@ -1,32 +1,25 @@
 package edu.uob;
 
-import java.io.File;
+import java.io.*;
 import java.io.IOException;
 
-public class DataBase {
+public class Dpath {
     //private String databaseStoragePath;
-    private String storagePath;
 
-    public void setStoragePath(String storagePath) {
-        this.storagePath = storagePath;
-    }
+    public Dpath() {}
 
-    public String getStoragePath() {
-        return storagePath;
-    }
     public void createDatabase(String databaseName) {
         databaseName = databaseName.toLowerCase();
         // Construct database storage path.
-        setStoragePath("databases"+ File.separator + databaseName);
-        File database = new File(getStoragePath());
+        File database = new File("databases", databaseName);
         try {
             // Create the database storage folder if it doesn't already exist.
             if (!database.exists()) {
                 database.mkdirs();
                 System.out.println("[OK]");
             }
-            // Set "global" database.
-            GlobalObject.getInstance().setDatabase(this);
+            // Set "global" database folder path.
+            PathManager.getPathInstance().setDatabaseStoragePath(database.getPath());
         } catch (SecurityException se) {
             System.out.println("Can't seem to create a database: " + database.getPath());
         }
@@ -36,7 +29,7 @@ public class DataBase {
         databaseName = databaseName.toLowerCase();
         try {
             // Construct database storage path.
-            File database = new File(getStoragePath());
+            File database = new File("databases", databaseName);
             // Return if the database isn't exit.
             if (!database.exists()) {
                 System.out.println("database is not exist: " + databaseName);
@@ -46,7 +39,7 @@ public class DataBase {
             dropDatabase(database);
             System.out.println("[OK]");
         } catch (IOException ioe) {
-            System.out.println("Can't seem to drop the database: " + getStoragePath());
+            System.out.println("Can't seem to drop the database: " + "databases" + File.separator + databaseName);
         }
     }
 

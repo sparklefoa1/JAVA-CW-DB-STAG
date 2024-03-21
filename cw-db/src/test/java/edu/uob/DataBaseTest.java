@@ -3,9 +3,6 @@ package edu.uob;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.util.ArrayList;
-
 public class DataBaseTest {
     private DataBase database;
     private String databaseName = "Marks";
@@ -18,6 +15,7 @@ public class DataBaseTest {
 
     @BeforeEach
     public void setupDatabase() {
+
         database = new DataBase();
         table = new Table();
         contentTest = new Insertion();
@@ -34,8 +32,8 @@ public class DataBaseTest {
         //table.printOutFile();
         //TableModification.insertContentLine("databases" + File.separator + "marks" + File.separator + "marks.tab", insertRow);//second will in the same line
         //contentTest.deleteContent(contentToDelete);
-        //table.dropTable(tableName);
-        //database.dropDatabase(databaseName);
+        table.dropTable(tableName);
+        database.dropDatabase(databaseName);
     }
 
     //@Test
