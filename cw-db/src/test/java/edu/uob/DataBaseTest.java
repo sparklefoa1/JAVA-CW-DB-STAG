@@ -3,6 +3,8 @@ package edu.uob;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.swing.*;
+
 public class DataBaseTest {
     private DataBase database;
     private String databaseName = "Marks";
@@ -38,6 +40,7 @@ public class DataBaseTest {
         //TablePrinter.printOutTable(table);
         //TablePrinter.printOUtLine(table, "mark", "21");
         //TablePrinter.printOutLineWithCharacter(table, "name", "bob");//没有结果依旧打印表头
+        TablePrinter.findColumn(table, "id", true);
         //TableModification.dropRow(table, "name", "Bob");
         //TableModification.dropColumn(table, "pass");
         //contentTest.deleteContent(contentToDelete);
