@@ -69,20 +69,4 @@ public class Table {
             throw new IOException("Can't seem to drop the database: " + table.getPath());
         }
     }
-
-    public void printOutFile() {
-        String filePath ="databases" + File.separator + "people.tab";
-        try {
-            FileReader reader = new FileReader(filePath);
-            BufferedReader bufferReader = new BufferedReader(reader);
-            String tableFile;
-            while ((tableFile = bufferReader.readLine()) != null) {
-                System.out.println(tableFile);
-            }
-            bufferReader.close();
-            reader.close();
-        } catch (IOException ioe) {
-            System.out.println("Can't read this file: " + filePath);
-        }
-    }
 }
