@@ -30,10 +30,16 @@ public class DataBaseTest {
         database.createDatabase(databaseName);
         table.createTable(tableName);
         //table.printOutFile();
-        //TableModification.insertContentLine("databases" + File.separator + "marks" + File.separator + "marks.tab", insertRow);//second will in the same line
+        //TableModification.insertContentLine(table, titleRow);
+        TableModification.insertContentLine(table, insertRow);
+        TableModification.insertContentLine(table, insertRow);
+        TableModification.addNewHeader(table, "testTitle");
+        TableModification.modifyTable(table, "name", "Bob", "testTitle", "1");
+        //TableModification.dropRow(table, "name", "Bob");
+        TableModification.dropColumn(table, "pass");
         //contentTest.deleteContent(contentToDelete);
-        table.dropTable(tableName);
-        database.dropDatabase(databaseName);
+        //table.dropTable(tableName);
+        //database.dropDatabase(databaseName);
     }
 
     //@Test

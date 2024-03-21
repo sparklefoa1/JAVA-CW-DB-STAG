@@ -31,12 +31,11 @@ public class Table {
     public void createTable(String tableName) {
         tableName = tableName.toLowerCase();
         currentDatabase = GlobalObject.getInstance().getDatabase();
-        setStoragePath(GlobalObject.getInstance().getDatabase().getStoragePath() + File.separator + tableName);
-        File table = new File(getStoragePath());
+        setStoragePath(GlobalObject.getInstance().getDatabase().getStoragePath() + File.separator + tableName + ".tab");
         try {
             // Create the table file
             if (!(currentDatabase == null)) {
-                Files.createFile(Paths.get(getStoragePath() + ".tab"));
+                Files.createFile(Paths.get(getStoragePath()));
                 GlobalObject.getInstance().setTable(this);
                 System.out.println("[OK]");
             }
@@ -49,9 +48,8 @@ public class Table {
 
     public void dropTable(String tableName) {
         tableName = tableName.toLowerCase();
-        //currentDatabase = PathManager.getPathInstance().getDatabaseStoragePath();
         try {
-            File table = new File(getStoragePath() + ".tab");
+            File table = new File(getStoragePath());
             // Return if the table isn't exit.
             if (!table.exists()) {
                 System.out.println("table is not exist: " + tableName + ".tab");
@@ -61,7 +59,7 @@ public class Table {
             dropTable(table);
             System.out.println("[OK]");
         } catch (IOException ioe) {
-            System.out.println("Can't seem to drop the table: " + currentDatabase + File.separator + tableName);
+            System.out.println("Can't seem to drop the table: " + getStoragePath());
         }
     }
 
