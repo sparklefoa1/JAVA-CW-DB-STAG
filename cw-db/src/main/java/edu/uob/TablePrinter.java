@@ -50,18 +50,25 @@ public class TablePrinter {
         }
     }
 
-    // Print out whole table.
-    public static void printOutFile(Table currentTable) {//use tableName?
+    public static void printOutLineWithCharacter(Table currentTable, String directColumnName, String characterToFind) {
         String tablePath = currentTable.getStoragePath();
         try {
-            FileReader reader = new FileReader(tablePath);
-            BufferedReader bufferReader = new BufferedReader(reader);
-            String tableFile;
-            while ((tableFile = bufferReader.readLine()) != null) {
-                System.out.println(tableFile);
+            List<String> lines = readFile(currentTable.getStoragePath());
+            // Analyse the table header and find the index of the column.
+            int columnIndex = getColumnIndex(lines.get(0), directColumnName);
+            String headerLine = lines.get(0);
+            System.out.println(headerLine);
+            // Find the position of the indexValue.
+            if (columnIndex != -1) {
+                for (int i = 1; i < lines.size(); i++) {
+                    String currentLine = lines.get(i);
+                    String[] tokens = currentLine.split("\t");
+                    if (tokens[columnIndex].contains(characterToFind)) {
+                        System.out.println(currentLine);
+                    }
+                }
             }
-            bufferReader.close();
-            reader.close();
+            System.out.println("[OK]");//位置移到前面去
         } catch (IOException ioe) {
             System.out.println("Can't read this file: " + tablePath);
         }

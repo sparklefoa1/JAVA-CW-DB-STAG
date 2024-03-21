@@ -31,12 +31,13 @@ public class DataBaseTest {
         table.createTable(tableName);
         //table.printOutFile();
         //TableModification.insertContentLine(table, titleRow);
-        TableModification.insertContentLine(table, insertRow);
-        TableModification.insertContentLine(table, insertRow);
+        //TableModification.insertContentLine(table, insertRow);
+        //TableModification.insertContentLine(table, insertRow);
         //TableModification.addNewHeader(table, "testTitle");
         //TableModification.modifyTable(table, "name", "Bob", "testTitle", "1");
         //TablePrinter.printOutTable(table);
         //TablePrinter.printOUtLine(table, "mark", "21");
+        //TablePrinter.printOutLineWithCharacter(table, "name", "bob");//没有结果依旧打印表头
         //TableModification.dropRow(table, "name", "Bob");
         //TableModification.dropColumn(table, "pass");
         //contentTest.deleteContent(contentToDelete);
