@@ -2,6 +2,7 @@ package edu.uob;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Parser {
     public static void CommandType(String[] commandName)
@@ -68,40 +69,41 @@ public class Parser {
             }
             return;
         }
-        if(strsame(p->wds[p->cw], "LOOP")){
-            p->cw = p->cw + 1;
-            //Ltr
-            if(!(isupper(p->wds[p->cw][0]))){
-                ERROR("No Letter?");
-            }
-            p->cw = p->cw + 1;
-            if(strsame(p->wds[p->cw], "OVER")){
-                p->cw = p->cw + 1;
-                Lst(p);
-                p->cw = p->cw + 1;
-                Inslst(p);
+        if(commandName[i] == "ALTER")){
+            i++;
+            if(commandName[i] == "TABLE"){
+                i++;
+                String tableName = commandName[i];
+                //set table by tablename
+                Table table = new Table();
+                table = GlobalObject.getInstance().getTable();
+                i++;
+                if(commandName[i] == "ADD"){
+                    i++;
+                    TableModification.addNewHeader(table, commandName[i]);
+                }else if(commandName[i] == "DROP"){
+                    i++;
+                    TableModification.dropColumn(table, commandName[i]);
+                }
             }
             else{
-                ERROR("No OVER instruction?");
+                //ERROR 语法错误
             }
             return;
         }
-        if(strsame(p->wds[p->cw], "SET")){
-            p->cw = p->cw + 1;
-            //Ltr
-            if(!(isupper(p->wds[p->cw][0]))){
-                ERROR("No Letter?");
+        if(commandName[i].equals("INSERT")){
+            i++;
+            if(commandName[i].equals("INTO")){
+                i++;
+                String tableName = commandName[i];
+                //set table by tablename
+                Table table = new Table();
+                table = GlobalObject.getInstance().getTable();
             }
-            p->cw = p->cw + 1;
-            if(strsame(p->wds[p->cw], "(")){
-                p->cw = p->cw + 1;
-                Pfix(p);
+            else {
+                //报错
             }
-            else{
-                ERROR("No ( instruction?");
-            }
-            return;
-        }
+
         ERROR("Expecting an instruction?");
     }
 }
