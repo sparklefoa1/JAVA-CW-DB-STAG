@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Parser {
-    public static void CommandType(String[] commandName)
+   /* public static void CommandType(String[] commandName)
     {
         // Convert to Capital letter.
         for (int i = 0; i < commandName.length; i++) {
@@ -105,5 +105,5 @@ public class Parser {
             }
 
         ERROR("Expecting an instruction?");
-    }
+    }*/
 }

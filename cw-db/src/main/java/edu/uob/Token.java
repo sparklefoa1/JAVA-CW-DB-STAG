@@ -8,7 +8,7 @@ public class Token {
     String[] specialCharacters = {"(",")",",",";"};
     ArrayList<String> tokens = new ArrayList<String>();
 
-    void setup()
+    ArrayList<String> setup()
     {
         // Remove any whitespace at the beginning and end of the query
         query = query.trim();
@@ -25,11 +25,10 @@ public class Token {
                 tokens.addAll(Arrays.asList(nextBatchOfTokens));
             }
         }
-        // Finally, loop through the result array list, printing out each token a line at a time
-        for(int i=0; i<tokens.size(); i++) System.out.println(tokens.get(i));
+        return tokens;
     }
 
-    String[] tokenise(String input)
+    private String[] tokenise(String input)
     {
         // Add in some extra padding spaces around the "special characters"
         // so we can be sure that they are separated by AT LEAST one space (possibly more)
