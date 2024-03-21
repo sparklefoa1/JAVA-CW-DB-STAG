@@ -8,6 +8,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TablePrinter {
+
+    // Print out whole table.
+    public static void  printOutTable(Table currentTable) {
+        String tablePath = currentTable.getStoragePath();
+        try {
+            List<String> lines = readFile(currentTable.getStoragePath());
+            for (int i = 0; i < lines.size(); i++) {
+                String currentLine = lines.get(i);
+                String[] tokens = currentLine.split("\t");
+                System.out.println(currentLine);
+            }
+            System.out.println("[OK]");//位置移到前面去
+        } catch (IOException ioe) {
+            System.out.println("Can't read this file: " + tablePath);
+        }
+    }
+
     // Print out special value/line.
     public static void  printOUtLine(Table currentTable, String directColumnName, String indexValue) {
         String tablePath = currentTable.getStoragePath();
@@ -15,6 +32,8 @@ public class TablePrinter {
             List<String> lines = readFile(currentTable.getStoragePath());
             // Analyse the table header and find the index of the column.
             int columnIndex = getColumnIndex(lines.get(0), directColumnName);
+            String headerLine = lines.get(0);
+            System.out.println(headerLine);
             // Find the position of the indexValue.
             if (columnIndex != -1) {
                 for (int i = 1; i < lines.size(); i++) {
@@ -25,7 +44,7 @@ public class TablePrinter {
                     }
                 }
             }
-            System.out.println("[OK]");
+            System.out.println("[OK]");//位置移到前面去
         } catch (IOException ioe) {
             System.out.println("Can't read this file: " + tablePath);
         }

@@ -30,12 +30,13 @@ public class DataBaseTest {
         database.createDatabase(databaseName);
         table.createTable(tableName);
         //table.printOutFile();
-        TableModification.insertContentLine(table, titleRow);
+        //TableModification.insertContentLine(table, titleRow);
         TableModification.insertContentLine(table, insertRow);
         TableModification.insertContentLine(table, insertRow);
-        TableModification.addNewHeader(table, "testTitle");
-        TableModification.modifyTable(table, "name", "Bob", "testTitle", "1");
-        TablePrinter.printOUtLine(table, "mark", "21");
+        //TableModification.addNewHeader(table, "testTitle");
+        //TableModification.modifyTable(table, "name", "Bob", "testTitle", "1");
+        //TablePrinter.printOutTable(table);
+        //TablePrinter.printOUtLine(table, "mark", "21");
         //TableModification.dropRow(table, "name", "Bob");
         //TableModification.dropColumn(table, "pass");
         //contentTest.deleteContent(contentToDelete);
