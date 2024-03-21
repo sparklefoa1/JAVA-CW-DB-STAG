@@ -16,15 +16,21 @@ public class TableModification {
         try {
             List<String> lines = readFile(currentTable.getStoragePath());
             int rowIndex;
+            int id = currentTable.getId();
             if (lines.isEmpty()) {
                 // Insert at the beginning when the table is empty.
                 rowIndex = 0;
             } else {
                 // Insert at the end when the table is not empty.
                 rowIndex = lines.size();
+                id = currentTable.getId() + 1;
+                currentTable.setId(id);
             }
 
             StringBuilder newLine = new StringBuilder();
+            if(id > 0){
+                newLine.append(id).append("\t");
+            }
             for (int i = 0; i < contentLine.length; i++) {
                 newLine.append(contentLine[i]);
                 // Add tab unless it's the last token.

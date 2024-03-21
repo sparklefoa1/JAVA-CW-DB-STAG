@@ -36,6 +36,7 @@ public class Table {
             // Create the table file
             if (!(currentDatabase == null)) {
                 Files.createFile(Paths.get(getStoragePath()));
+                setId(0);
                 GlobalObject.getInstance().setTable(this);
                 System.out.println("[OK]");
             }

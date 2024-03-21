@@ -10,7 +10,7 @@ public class DataBaseTest {
     private String tableName = "marks";
     private Insertion contentTest;
     private String[] titleRow = {"id", "name", "mark", "pass"};
-    private String[] insertRow = {"1", "Bob", "21", "@bob.net"};
+    private String[] insertRow = {"Bob", "21", "@bob.net"};
     private  String contentToDelete = "id";
 
     @BeforeEach
@@ -30,13 +30,13 @@ public class DataBaseTest {
         database.createDatabase(databaseName);
         table.createTable(tableName);
         //table.printOutFile();
-        //TableModification.insertContentLine(table, titleRow);
+        TableModification.insertContentLine(table, titleRow);
         TableModification.insertContentLine(table, insertRow);
         TableModification.insertContentLine(table, insertRow);
         TableModification.addNewHeader(table, "testTitle");
         TableModification.modifyTable(table, "name", "Bob", "testTitle", "1");
         //TableModification.dropRow(table, "name", "Bob");
-        TableModification.dropColumn(table, "pass");
+        //TableModification.dropColumn(table, "pass");
         //contentTest.deleteContent(contentToDelete);
         //table.dropTable(tableName);
         //database.dropDatabase(databaseName);
