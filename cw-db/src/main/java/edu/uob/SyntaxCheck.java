@@ -179,6 +179,8 @@ public class SyntaxCheck {
             } else {
                 throw new Exception("[ERROR]: TableName1 is invalid.");
             }
+        } else {
+            throw new Exception("[ERROR]: Command is invalid.");
         }
     }
     public static int nameValueListCheck(ArrayList<String> tokens, int index) throws Exception {

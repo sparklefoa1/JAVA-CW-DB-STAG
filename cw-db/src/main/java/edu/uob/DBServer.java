@@ -44,11 +44,10 @@ public class DBServer {
         try {
             SyntaxCheck.command(commandTokens);
         } catch (Exception e) {
-            System.out.println("[ERROR]:"+ e.getMessage());
-            e.printStackTrace();
+            return e.getMessage();
         }
         String ok = "[OK]";
-
+        Parser.processTokens(commandTokens);
         return "";
     }
 
