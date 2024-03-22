@@ -1,9 +1,7 @@
 package edu.uob;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.List;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -304,8 +302,10 @@ public class Parser {
             tableName = tableName.toLowerCase();
             currentTable.setStoragePath(currentDatabase.getStoragePath() + File.separator + tableName + ".tab");
             GlobalObject.getInstance().setTable(currentTable);
-
-            //会有3个表
+            //read table1
+            //create table3 and add table1 content
+            //read table2
+            //add content of table2 to table3
         }
     }
     public static List<Integer> findMatchingIndices5(ArrayList<String> tokens, int value) {
