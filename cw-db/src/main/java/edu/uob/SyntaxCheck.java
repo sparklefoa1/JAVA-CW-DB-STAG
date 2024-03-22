@@ -19,8 +19,7 @@ public class SyntaxCheck {
             if(!PlainTextCheck(databaseName)){
                 throw new Exception("[ERROR]: DatabaseName is invalid.");
             }
-        }
-        if(commandType.equals("CREATE")){
+        } else if(commandType.equals("CREATE")){
             String createType = tokens.get(1);
             createType = createType.toUpperCase();
             if(createType.equals("DATABASE") || createType.equals("TABLE")) {
@@ -31,8 +30,7 @@ public class SyntaxCheck {
             } else {
                 throw new Exception("[ERROR]: CreateType is invalid.");
             }
-        }
-        if(commandType.equals("DROP")){
+        } else if(commandType.equals("DROP")){
             String dropType = tokens.get(1);
             dropType = dropType.toUpperCase();
             if(dropType.equals("DATABASE") || dropType.equals("TABLE")) {
@@ -43,8 +41,7 @@ public class SyntaxCheck {
             } else {
                 throw new Exception("[ERROR]: DropType is invalid.");
             }
-        }
-        if(commandType.equals("ALTER")){
+        } else if(commandType.equals("ALTER")){
             String alterTable = tokens.get(1);
             alterTable = alterTable.toUpperCase();
             if(alterTable.equals("TABLE")) {
@@ -66,8 +63,7 @@ public class SyntaxCheck {
             } else {
                 throw new Exception("[ERROR]: AlterObject is invalid.");
             }
-        }
-        if(commandType.equals("INSERT")){
+        } else if(commandType.equals("INSERT")){
             String text = tokens.get(1);
             text = text.toUpperCase();
             if(text.equals("INTO")) {
@@ -90,8 +86,7 @@ public class SyntaxCheck {
             } else {
                 throw new Exception("[ERROR]: Syntax is invalid.");
             }
-        }
-        if(commandType.equals("SELECT")){
+        } else if(commandType.equals("SELECT")){
             int index = 1;
             String wildAttribList = tokens.get(1);
             if(!wildAttribList.equals("*")){
@@ -112,8 +107,7 @@ public class SyntaxCheck {
             } else {
                 throw new Exception("[ERROR]: KeyWord 'FROM' is missing.");
             }
-        }
-        if(commandType.equals("UPDATE")){
+        } else if(commandType.equals("UPDATE")){
             String tablename = tokens.get(1);
             if(PlainTextCheck(tablename)) {
                 if(tokens.get(2).equalsIgnoreCase("SET")){
@@ -130,8 +124,7 @@ public class SyntaxCheck {
             } else {
                 throw new Exception("[ERROR]: TableName is invalid.");
             }
-        }
-        if(commandType.equals("DELETE")){
+        } else if(commandType.equals("DELETE")){
             if(tokens.get(1).equalsIgnoreCase("FROM")){
                 String tableName = tokens.get(2);
                 if(PlainTextCheck(tableName)){
@@ -146,8 +139,7 @@ public class SyntaxCheck {
             } else {
                 throw new Exception("[ERROR]: KeyWord 'FROM' is missing.");
             }
-        }
-        if(commandType.equals("JOIN")){
+        } else if(commandType.equals("JOIN")){
             String tablename1 = tokens.get(1);
             if(PlainTextCheck(tablename1)) {
                 if(tokens.get(2).equalsIgnoreCase("AND")){

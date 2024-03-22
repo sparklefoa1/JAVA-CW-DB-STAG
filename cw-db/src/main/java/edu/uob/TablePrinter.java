@@ -11,7 +11,7 @@ import java.util.List;
 public class TablePrinter {
 
     // Print out whole table.
-    public static void  printOutTable(Table currentTable) {
+    public static void printOutTable(Table currentTable) {
         String tablePath = currentTable.getStoragePath();
         try {
             List<String> lines = readFile(currentTable.getStoragePath());
@@ -26,7 +26,7 @@ public class TablePrinter {
     }
 
     // Print out special value/line.
-    public static void  printOUtLine(Table currentTable, String directColumnName, String indexValue) {
+    public static void printOUtLine(Table currentTable, String directColumnName, String indexValue) {
         String tablePath = currentTable.getStoragePath();
         try {
             List<String> lines = readFile(currentTable.getStoragePath());

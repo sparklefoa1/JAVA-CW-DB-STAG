@@ -1,5 +1,7 @@
 package edu.uob;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.io.File;
 import java.util.ArrayList;
