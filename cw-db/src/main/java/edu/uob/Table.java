@@ -41,7 +41,7 @@ public class Table {
                 Files.createFile(Paths.get(getStoragePath()));
                 setId(0);
                 GlobalObject.getInstance().setTable(this);
-                System.out.println("[OK]");
+                //System.out.println("[OK]");
             }
         } catch (FileAlreadyExistsException e) {
             System.out.println("Table already exists: " + currentDatabase);
@@ -56,12 +56,12 @@ public class Table {
             File table = new File(getStoragePath());
             // Return if the table isn't exit.
             if (!table.exists()) {
-                System.out.println("table is not exist: " + tableName + ".tab");
+                //System.out.println("table is not exist: " + tableName + ".tab");
                 return;
             }
             // Recursively delete table and its contents.
             dropTable(table);
-            System.out.println("[OK]");
+            //System.out.println("[OK]");
         } catch (IOException ioe) {
             System.out.println("Can't seem to drop the table: " + getStoragePath());
         }

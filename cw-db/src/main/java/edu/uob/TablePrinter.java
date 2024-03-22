@@ -20,7 +20,6 @@ public class TablePrinter {
                 String[] tokens = currentLine.split("\t");
                 System.out.println(currentLine);
             }
-            System.out.println("[OK]");//位置移到前面去
         } catch (IOException ioe) {
             System.out.println("Can't read this file: " + tablePath);
         }
@@ -45,7 +44,6 @@ public class TablePrinter {
                     }
                 }
             }
-            System.out.println("[OK]");//位置移到前面去
         } catch (IOException ioe) {
             System.out.println("Can't read this file: " + tablePath);
         }
@@ -69,7 +67,6 @@ public class TablePrinter {
                     }
                 }
             }
-            System.out.println("[OK]");//位置移到前面去
         } catch (IOException ioe) {
             System.out.println("Can't read this file: " + tablePath);
         }
@@ -98,7 +95,6 @@ public class TablePrinter {
                     }
                 }
             }
-            System.out.println("[OK]");//位置移到前面去
         } catch (IOException ioe) {
             System.out.println("Can't read this file: " + tablePath);
         }
@@ -125,7 +121,6 @@ public class TablePrinter {
                         System.out.println(tokens[columnIndex]);
                     }
                 }
-                System.out.println("[OK]");
             } else {
                 System.out.println("Column " + headerName + " not found.");
             }
@@ -148,7 +143,6 @@ public class TablePrinter {
                     // Print the value at the column.
                     System.out.println(tokens[columnIndex]);
                 }
-                System.out.println("[OK]");
             } else {
                 System.out.println("Column " + headerName + " not found.");
             }
@@ -212,7 +206,6 @@ public class TablePrinter {
                     }
                 }
             }
-            System.out.println("[OK]");//位置移到前面去
         } catch (IOException ioe) {
             System.out.println("Can't read this file: " + tablePath);
         }

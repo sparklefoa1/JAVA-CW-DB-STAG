@@ -45,7 +45,7 @@ public class TableModification {
             lines.add(rowIndex, newLine.toString());
 
             writeFile(currentTable.getStoragePath(), lines);
-            System.out.println("[OK]");
+            //System.out.println("[OK]");
         } catch (IOException ioe) {
             System.out.println("Can't insert the content: " + ioe.getMessage());
         }
@@ -62,7 +62,7 @@ public class TableModification {
             lines.set(0, headerLine);
 
             writeFile(currentTable.getStoragePath(), lines);
-            System.out.println("[OK]");
+            //System.out.println("[OK]");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -96,7 +96,7 @@ public class TableModification {
             }
 
             writeFile(currentTable.getStoragePath(), lines);
-            System.out.println("[OK]");
+            //System.out.println("[OK]");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
@@ -120,7 +120,7 @@ public class TableModification {
                 }
 
                 writeFile(currentTable.getStoragePath(), lines);
-                System.out.println("[OK]");
+                //System.out.println("[OK]");
             } else {
                 throw new IllegalArgumentException("Column " + directColumnName + " not found.");
             }
@@ -146,7 +146,7 @@ public class TableModification {
                     }
                 }
                 writeFile(currentTable.getStoragePath(), lines);
-                System.out.println("[OK]");//位置移到前面去
+                //System.out.println("[OK]");
             } else {
                 throw new IllegalArgumentException("Column " + directColumnName + " not found.");
             }
@@ -175,7 +175,7 @@ public class TableModification {
                 }
 
                 writeFile(currentTable.getStoragePath(), lines);
-                System.out.println("[OK]");
+                //System.out.println("[OK]");
             } else {
                 System.out.println("Column " + headerName + " not found.");
             }

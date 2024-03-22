@@ -23,7 +23,6 @@ public class DataBase {
             // Create the database storage folder if it doesn't already exist.
             if (!database.exists()) {
                 database.mkdirs();
-                System.out.println("[OK]");
             }
             // Set "global" database.
             GlobalObject.getInstance().setDatabase(this);
@@ -44,7 +43,7 @@ public class DataBase {
             }
             // Recursively delete database and its contents.
             dropDatabase(database);
-            System.out.println("[OK]");
+            //System.out.println("[OK]");
         } catch (IOException ioe) {
             System.out.println("Can't seem to drop the database: " + getStoragePath());
         }

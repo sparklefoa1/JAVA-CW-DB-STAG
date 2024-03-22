@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Paths;
 import java.nio.file.Files;
+import java.util.ArrayList;
 
 /** This class implements the DB server. */
 public class DBServer {
@@ -38,6 +39,16 @@ public class DBServer {
     */
     public String handleCommand(String command) {
         // TODO implement your server logic here
+        Token tokens = new Token();
+        ArrayList<String> commandTokens = tokens.setup(command);
+        try {
+            SyntaxCheck.command(commandTokens);
+        } catch (Exception e) {
+            System.out.println("[ERROR]:"+ e.getMessage());
+            e.printStackTrace();
+        }
+        String ok = "[OK]";
+
         return "";
     }
 
