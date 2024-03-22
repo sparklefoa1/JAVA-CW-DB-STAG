@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Token {
-    String query = "  INSERT  INTO  people   VALUES(  'Simon Lock'  ,35, 'simon@bristol.ac.uk' , 1.8  ) ; ";
     String[] specialCharacters = {"(",")",",",";"};
     ArrayList<String> tokens = new ArrayList<String>();
 
-    ArrayList<String> setup()
+    ArrayList<String> setup(String query)
     {
         // Remove any whitespace at the beginning and end of the query
         query = query.trim();

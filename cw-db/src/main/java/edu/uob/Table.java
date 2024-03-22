@@ -12,6 +12,9 @@ public class Table {
     private DataBase currentDatabase;
     private String storagePath;
     private int id;
+    public Table(){
+        id = 0;
+    }
 
     public void setStoragePath(String storagePath) {
         this.storagePath = storagePath;

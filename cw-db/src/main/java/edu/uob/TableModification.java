@@ -28,6 +28,9 @@ public class TableModification {
             }
 
             StringBuilder newLine = new StringBuilder();
+            if(id == 0){
+                newLine.append("id").append("\t");
+            }
             if(id > 0){
                 newLine.append(id).append("\t");
             }
@@ -123,6 +126,32 @@ public class TableModification {
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();
+        }
+    }
+
+    public static void dropLineWithCharacter(Table currentTable, String directColumnName, String characterToFind) {
+        String tablePath = currentTable.getStoragePath();
+        try {
+            List<String> lines = readFile(currentTable.getStoragePath());
+            // Analyse the table header and find the index of the column.
+            int columnIndex = getColumnIndex(lines.get(0), directColumnName);
+            // Find the position of the indexValue.
+            if (columnIndex != -1) {
+                for (int i = 1; i < lines.size(); i++) {
+                    String currentLine = lines.get(i);
+                    String[] tokens = currentLine.split("\t");
+                    if (tokens[columnIndex].contains(characterToFind)) {
+                        lines.remove(i);
+                        i--;
+                    }
+                }
+                writeFile(currentTable.getStoragePath(), lines);
+                System.out.println("[OK]");//位置移到前面去
+            } else {
+                throw new IllegalArgumentException("Column " + directColumnName + " not found.");
+            }
+        } catch (IOException ioe) {
+            System.out.println("Can't read this file: " + tablePath);
         }
     }
 

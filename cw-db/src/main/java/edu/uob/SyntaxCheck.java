@@ -3,7 +3,7 @@ package edu.uob;
 import java.util.ArrayList;
 
 public class SyntaxCheck {
-    void command(ArrayList<String> tokens) throws Exception {
+    public static void command(ArrayList<String> tokens) throws Exception {
 
         if(!tokens.get(tokens.size() - 1).equals(";")){
             throw new Exception("[ERROR]: Semi colon missing at end of line.");
@@ -11,7 +11,7 @@ public class SyntaxCheck {
         commandTypeCheck(tokens);
     }
 
-    void commandTypeCheck(ArrayList<String> tokens) throws Exception {
+    public static void commandTypeCheck(ArrayList<String> tokens) throws Exception {
         String commandType = tokens.get(0);
         commandType = commandType.toUpperCase();
         if(commandType.equals("USE")){
@@ -181,7 +181,7 @@ public class SyntaxCheck {
             }
         }
     }
-    int nameValueListCheck(ArrayList<String> tokens, int index) throws Exception {
+    public static int nameValueListCheck(ArrayList<String> tokens, int index) throws Exception {
         if(tokens.get(index+2).equals(",")){
             nameValuePairCheck(tokens, index+1);
             index = index + 2;
@@ -190,7 +190,7 @@ public class SyntaxCheck {
         nameValuePairCheck(tokens, index+1);
         return index+4;
     }
-    void nameValuePairCheck(ArrayList<String> tokens, int index) throws Exception {
+    public static void nameValuePairCheck(ArrayList<String> tokens, int index) throws Exception {
         if(PlainTextCheck(tokens.get(index))){
             if(tokens.get(index+1).equals("=")){
                 valueCheck(tokens.get(index+2));
@@ -202,7 +202,7 @@ public class SyntaxCheck {
         }
     }
 
-    void conditionCheck(ArrayList<String> tokens, int index) throws Exception{
+    public static void conditionCheck(ArrayList<String> tokens, int index) throws Exception{
         int bound = tokens.size() - index;
         if(bound == 5){
             if(tokens.get(index).equals("(")){
@@ -361,7 +361,7 @@ public class SyntaxCheck {
             throw new Exception("[ERROR]: Syntax is invalid.");
         }
     }
-    void condition1(ArrayList<String> tokens, int index) throws Exception {
+   public static void condition1(ArrayList<String> tokens, int index) throws Exception {
         if(!PlainTextCheck(tokens.get(index))){
             throw new Exception("[ERROR]: AttributeName is invalid.");
         }
@@ -381,7 +381,7 @@ public class SyntaxCheck {
             throw new Exception("[ERROR]: Comparator is missing.");
         }
     }
-    int attribListCheck(ArrayList<String> tokens, int index) throws Exception {
+    public static int attribListCheck(ArrayList<String> tokens, int index) throws Exception {
         String attributeName = tokens.get(index+1);
         if(!tokens.get(index+2).equals(",")){
             if(PlainTextCheck(attributeName)){
@@ -398,7 +398,7 @@ public class SyntaxCheck {
         }
         return index+1;
     }
-    void valueListCheck(ArrayList<String> tokens, int index) throws Exception {
+    public static void valueListCheck(ArrayList<String> tokens, int index) throws Exception {
         if(!tokens.get(index+2).equals(",")){
             valueCheck(tokens.get(index+1));
             return;
@@ -408,7 +408,7 @@ public class SyntaxCheck {
         valueListCheck(tokens, index);
     }
 
-    void valueCheck(String value) throws Exception {
+    public static void valueCheck(String value) throws Exception {
         if(value.startsWith("'") && value.endsWith("'")){
             return;
         }
@@ -424,7 +424,7 @@ public class SyntaxCheck {
         throw new Exception("[ERROR]: Value is invalid.");
     }
 
-    boolean PlainTextCheck(String text){
+    public static boolean PlainTextCheck(String text){
         return text.matches("[a-zA-Z0-9]+");
     }
 }
