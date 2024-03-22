@@ -46,6 +46,7 @@ public class DBServer {
         } catch (Exception e) {
             return e.getMessage();
         }
+        //Can only print results on the command line, no return value...
         Parser.processTokens(commandTokens);
         return "[OK]";
     }
