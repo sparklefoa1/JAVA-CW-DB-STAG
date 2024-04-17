@@ -10,7 +10,6 @@ public class DataBaseTest {
     private String databaseName = "Marks";
     private Table table;
     private String tableName = "marks";
-    private Insertion contentTest;
     private String[] titleRow = {"id", "name", "mark", "pass"};
     private String[] insertRow = {"Bob", "21", "@bob.net"};
     private  String contentToDelete = "id";
@@ -20,15 +19,14 @@ public class DataBaseTest {
 
         database = new DataBase();
         table = new Table();
-        contentTest = new Insertion();
     }
 
     @Test
     public void testCreateDatabase() {
-        //TableModification.addNewHeader("databases" + File.separator + "people.tab", "add");
-        //TableModification.modifyTable("databases" + File.separator + "people.tab", "Name", "Chris", "test", "21");
-        //TableModification.dropColumn("databases" + File.separator + "people.tab", "add");
-        //TableModification.dropRow("databases" + File.separator + "people.tab", "Name", "Bob");
+        //TableModification.addNewHeader("databases" + File.separator + "", "add");
+        //TableModification.modifyTable("databases" + File.separator + "", "Name", "Chris", "test", "21");
+        //TableModification.dropColumn("databases" + File.separator + "", "add");
+        //TableModification.dropRow("databases" + File.separator + "", "Name", "Bob");
         database.createDatabase(databaseName);
         table.createTable(tableName);
         //table.printOutFile();
