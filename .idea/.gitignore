@@ -6,3 +6,18 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+/cw-db/
+# Compiled and build-generated files
+*.class
+/target/
+# Build tool configuration files
+*.iml
+*.ipr
+*.iws
+# Temporary files and runtime-generated content
+/logs/
+/tmp/
+/temp/
+*.tmp
+*.log
+*.bak
