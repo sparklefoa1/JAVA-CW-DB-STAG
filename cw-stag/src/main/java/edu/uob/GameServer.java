@@ -1,14 +1,18 @@
 package edu.uob;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import com.alexmerz.graphviz.ParseException;
+import com.alexmerz.graphviz.Parser;
+import com.alexmerz.graphviz.objects.Graph;
+import com.alexmerz.graphviz.objects.Node;
+
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.ErrorManager;
 
 public final class GameServer {
 
@@ -30,6 +34,11 @@ public final class GameServer {
     */
     public GameServer(File entitiesFile, File actionsFile) {
         // TODO implement your server logic here
+        // Load entities from entitiesFile
+
+
+        // Load actions form actionsFile
+        // Initialize GameServer
     }
 
     /**
@@ -40,7 +49,9 @@ public final class GameServer {
     */
     public String handleCommand(String command) {
         // TODO implement your server logic here
-        return "";
+        // Receive command from client
+        // Process the command to GameServer
+        return " ";// Return response to client
     }
 
     /**
