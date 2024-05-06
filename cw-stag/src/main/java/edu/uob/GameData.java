@@ -40,63 +40,48 @@ public class GameData {
             Graph wholeDocument = parser.getGraphs().get(0);
             ArrayList<Graph> sections = wholeDocument.getSubgraphs();
 
-            // 存储位置和路径数据
+            // store locations & its contents
             ArrayList<Graph> locations = sections.get(0).getSubgraphs();
             for (Graph locationGraph : locations) {
-            //for (Graph section : sections) {
-                //ArrayList<Node> nodes = section.getNodes(false);
-                //if (!nodes.isEmpty()) {
-                    //String sectionType = nodes.get(0).getId().getId();
-                    //if (sectionType.startsWith("cluster")) {
-                       // String locationName = sectionType.substring(7); // 移除 "cluster" 前缀
                 Node locationDetails = locationGraph.getNodes(false).get(0);
                 String locationName = locationDetails.getId().getId();
                 String locationDescription = locationDetails.getAttribute("description");
-                // 存储位置数据
+                // store locations data
                 //addLocation(locationName, locationDescription);
-                System.out.println(locationName + locationDescription);
-                       /* // 存储家具数据
-                        ArrayList<Graph> subgraphs = section.getSubgraphs();
-                        for (Graph subgraph : subgraphs) {
-                            if (subgraph.getId().getId().equals("furniture")) {
-                                ArrayList<Node> furnitureNodes = subgraph.getNodes(false);
-                                for (Node furnitureNode : furnitureNodes) {
-                                    String furnitureName = furnitureNode.getId().getId();
-                                    String furnitureDescription = furnitureNode.getAttribute("description");
-                                    // 将家具数据存储到GameData实例中，并与对应的位置关联
-                                    addFurniture(locationName, furnitureName, furnitureDescription);
-                                }
-                            } else if (subgraph.getId().getId().equals("artefacts")) {
-                                ArrayList<Node> artefactNodes = subgraph.getNodes(false);
-                                for (Node artefactNode : artefactNodes) {
-                                    String artefactName = artefactNode.getId().getId();
-                                    String artefactDescription = artefactNode.getAttribute("description");
-                                    // 将道具数据存储到GameData实例中，并与对应的位置关联
-                                    addArtefact(locationName, artefactName, artefactDescription);
-                                }
-                            }
+                System.out.println(locationName + " " + locationDescription);
+                // store artefacts, furniture & characters data
+                ArrayList<Graph> subGraphs = locationGraph.getSubgraphs();
+                for (Graph subgraph : subGraphs) {
+                    if (subgraph.getId().getId().equals("artefacts")) {
+                        ArrayList<Node> artefactsNodes = subgraph.getNodes(false);
+                        for (Node artefactsNode : artefactsNodes) {
+                            String artefactsName = artefactsNode.getId().getId();
+                            String artefactsDescription = artefactsNode.getAttribute("description");
+                            // 将道具数据存储到GameData实例中，并与对应的位置关联
+                            //addArtefact(locationName, artefactName, artefactDescription);
+                            System.out.println(artefactsName + " " + artefactsDescription);
                         }
-                    } else if (sectionType.equals("paths")) {
-                        // 存储路径数据
-                        ArrayList<Edge> edges = section.getEdges();
-                        for (Edge edge : edges) {
-                            String fromLocation = edge.getSource().getNode().getId().getId();
-                            String toLocation = edge.getTarget().getNode().getId().getId();
-                            // 将路径数据存储到GameData实例中
-                            addPath(fromLocation, toLocation);
+                    } else if (subgraph.getId().getId().equals("furniture")) {
+                        ArrayList<Node> furnitureNodes = subgraph.getNodes(false);
+                        for (Node furnitureNode : furnitureNodes) {
+                            String furnitureName = furnitureNode.getId().getId();
+                            String furnitureDescription = furnitureNode.getAttribute("description");
+                            // 将家具数据存储到GameData实例中，并与对应的位置关联
+                            //addFurniture(locationName, furnitureName, furnitureDescription);
+                            System.out.println(furnitureName + " " + furnitureDescription);
+                        }
+                    } else if (subgraph.getId().getId().equals("characters")) {
+                        ArrayList<Node> charactersNodes = subgraph.getNodes(false);
+                        for (Node charactersNode : charactersNodes) {
+                            String charactersName = charactersNode.getId().getId();
+                            String charactersDescription = charactersNode.getAttribute("description");
+                            // 将角色数据存储到GameData实例中，并与对应的位置关联
+                            //addFurniture(locationName, furnitureName, furnitureDescription);
+                            System.out.println(charactersName + " " + charactersDescription);
                         }
                     }
-                }*/
+                }
             }
-            /*// store locations
-            ArrayList<Graph> locations = sections.get(0).getSubgraphs();
-            for (Graph locationGraph : locations) {
-                Node locationDetails = locationGraph.getNodes(false).get(0);
-                String locationName = locationDetails.getId().getId();
-                // 将位置数据存储到GameData实例中
-                addLocation(locationName);
-            }
-
             // store paths
             ArrayList<Edge> paths = sections.get(1).getEdges();
             for (Edge path : paths) {
@@ -105,8 +90,9 @@ public class GameData {
                 Node toLocation = path.getTarget().getNode();
                 String toName = toLocation.getId().getId();
                 // 将路径数据存储到GameData实例中
-                addPath(fromName, toName);
-            }*/
+                //addPath(fromName, toName);
+                System.out.println(fromName + " " + toName);
+            }
         } finally {
             if (bufferedReader != null) {
                 bufferedReader.close();
