@@ -30,6 +30,11 @@ public final class GameServer {
     */
     public GameServer(File entitiesFile, File actionsFile) {
         // TODO implement your server logic here
+        // Initialize game:
+        // Load data
+
+        // Initialize GameEntities
+        // Set Action logics
     }
 
     /**
