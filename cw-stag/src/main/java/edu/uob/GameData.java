@@ -113,7 +113,7 @@ public class GameData {
                             String charactersName = charactersNode.getId().getId();
                             String charactersDescription = charactersNode.getAttribute("description");
                             // 将角色数据存储到GameData实例中，并与对应的位置关联
-                            addFurniture(locationName, charactersName, charactersDescription);
+                            addCharacter(locationName, charactersName, charactersDescription);
                             //System.out.println(charactersName + " " + charactersDescription);
                         }
                     }
