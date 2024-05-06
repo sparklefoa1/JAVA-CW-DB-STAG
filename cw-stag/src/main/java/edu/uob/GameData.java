@@ -11,21 +11,59 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GameData {
-    /*private ArrayList<Location> locations;
-    private ArrayList<Artefact> artefacts;
-    private ArrayList<Furniture> furniture;
-    private ArrayList<Character> characters;
-    private Player player;*/
-
+    private Map<String, Locations> locations;
+    private List<String[]> paths;
     public GameData() {
-        /*locations = new ArrayList<>();
-        artefacts = new ArrayList<>();
-        furniture = new ArrayList<>();
-        characters = new ArrayList<>();
-        player = null;*/
+        locations = new HashMap<>();
+        paths = new ArrayList<>();
+    }
+    // 添加位置
+    public void addLocation(String name, String description) {
+        locations.put(name, new Locations(name, description));
+    }
+    // 添加道具
+    public void addArtefact(String locationName, String artefactName, String artefactDescription) {
+        Locations location = locations.get(locationName);
+        if (location != null) {
+            location.addArtefact(artefactName, artefactDescription);
+        }
+    }
+    // 添加家具
+    public void addFurniture(String locationName, String furnitureName, String furnitureDescription) {
+        Locations location = locations.get(locationName);
+        if (location != null) {
+            location.addFurniture(furnitureName, furnitureDescription);
+        }
+    }
+    // 添加角色
+    public void addCharacter(String locationName, String characterName, String characterDescription) {
+        Locations location = locations.get(locationName);
+        if (location != null) {
+            location.addCharacter(characterName, characterDescription);
+        }
+    }
+    // 添加路径
+    public void addPath(String from, String to) {
+        paths.add(new String[]{from, to});
+    }
+
+    // 获取位置
+    public Locations getLocation(String name) {
+        return locations.get(name);
+    }
+
+    // 获取所有位置
+    public Map<String, Locations> getAllLocations() {
+        return locations;
+    }
+
+    // 获取路径
+    public List<String[]> getPaths() {
+        return paths;
     }
 
     // parse & store game data
@@ -33,7 +71,6 @@ public class GameData {
         Parser parser = new Parser();
         FileReader reader = null;
         BufferedReader bufferedReader = null;
-
         try {
             reader = new FileReader(filePath);
             parser.parse(reader);
@@ -47,8 +84,8 @@ public class GameData {
                 String locationName = locationDetails.getId().getId();
                 String locationDescription = locationDetails.getAttribute("description");
                 // store locations data
-                //addLocation(locationName, locationDescription);
-                System.out.println(locationName + " " + locationDescription);
+                addLocation(locationName, locationDescription);
+                //System.out.println(locationName + " " + locationDescription);
                 // store artefacts, furniture & characters data
                 ArrayList<Graph> subGraphs = locationGraph.getSubgraphs();
                 for (Graph subgraph : subGraphs) {
@@ -58,8 +95,8 @@ public class GameData {
                             String artefactsName = artefactsNode.getId().getId();
                             String artefactsDescription = artefactsNode.getAttribute("description");
                             // 将道具数据存储到GameData实例中，并与对应的位置关联
-                            //addArtefact(locationName, artefactName, artefactDescription);
-                            System.out.println(artefactsName + " " + artefactsDescription);
+                            addArtefact(locationName, artefactsName, artefactsDescription);
+                            //System.out.println(artefactsName + " " + artefactsDescription);
                         }
                     } else if (subgraph.getId().getId().equals("furniture")) {
                         ArrayList<Node> furnitureNodes = subgraph.getNodes(false);
@@ -67,8 +104,8 @@ public class GameData {
                             String furnitureName = furnitureNode.getId().getId();
                             String furnitureDescription = furnitureNode.getAttribute("description");
                             // 将家具数据存储到GameData实例中，并与对应的位置关联
-                            //addFurniture(locationName, furnitureName, furnitureDescription);
-                            System.out.println(furnitureName + " " + furnitureDescription);
+                            addFurniture(locationName, furnitureName, furnitureDescription);
+                            //System.out.println(furnitureName + " " + furnitureDescription);
                         }
                     } else if (subgraph.getId().getId().equals("characters")) {
                         ArrayList<Node> charactersNodes = subgraph.getNodes(false);
@@ -76,11 +113,12 @@ public class GameData {
                             String charactersName = charactersNode.getId().getId();
                             String charactersDescription = charactersNode.getAttribute("description");
                             // 将角色数据存储到GameData实例中，并与对应的位置关联
-                            //addFurniture(locationName, furnitureName, furnitureDescription);
-                            System.out.println(charactersName + " " + charactersDescription);
+                            addFurniture(locationName, charactersName, charactersDescription);
+                            //System.out.println(charactersName + " " + charactersDescription);
                         }
                     }
                 }
+
             }
             // store paths
             ArrayList<Edge> paths = sections.get(1).getEdges();
@@ -90,8 +128,8 @@ public class GameData {
                 Node toLocation = path.getTarget().getNode();
                 String toName = toLocation.getId().getId();
                 // 将路径数据存储到GameData实例中
-                //addPath(fromName, toName);
-                System.out.println(fromName + " " + toName);
+                addPath(fromName, toName);
+                //System.out.println(fromName + " " + toName);
             }
         } finally {
             if (bufferedReader != null) {
@@ -102,52 +140,10 @@ public class GameData {
             }
         }
     }
-
-    /*// add locations
-    public void addLocation(String location) {
-        locations.add(location);
-    }
-
-    // 添加物品
-    public void addArtefact(Artefact artefact) {
-        artefacts.add(artefact);
-    }
-
-    // 添加家具
-    public void addFurniture(Furniture item) {
-        furniture.add(item);
-    }
-
-    // 添加角色
-    public void addCharacter(Character character) {
-        characters.add(character);
-    }
-
-    // 设置玩家
+   /* // 设置玩家
     public void setPlayer(Player player) {
         this.player = player;
     }
-
-    // 获取位置列表
-    public ArrayList<Location> getLocations() {
-        return locations;
-    }
-
-    // 获取物品列表
-    public ArrayList<Artefact> getArtefacts() {
-        return artefacts;
-    }
-
-    // 获取家具列表
-    public ArrayList<Furniture> getFurniture() {
-        return furniture;
-    }
-
-    // 获取角色列表
-    public ArrayList<Character> getCharacters() {
-        return characters;
-    }
-
     // 获取玩家
     public Player getPlayer() {
         return player;

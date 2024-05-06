@@ -7,18 +7,20 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Map;
 
 public class GameDataTests {
-    private GameData location;
+    private GameData parseLocation;
 
     @BeforeEach
     void setUp() {
-        location = new GameData();
+        parseLocation = new GameData();
     }
 
     @Test
     void testParseLocations() throws IOException, ParseException {
         String filePath = "config" + File.separator + "basic-entities.dot";
-        location.parseGameDataFromFile(filePath);
+        parseLocation.parseGameDataFromFile(filePath);
+        System.out.println(parseLocation.getLocation("cabin").getDescription());
     }
 }
