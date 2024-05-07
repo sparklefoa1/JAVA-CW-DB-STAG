@@ -3,7 +3,9 @@ package edu.uob;
 import com.alexmerz.graphviz.ParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -18,9 +20,12 @@ public class GameDataTests {
     }
 
     @Test
-    void testParseLocations() throws IOException, ParseException {
+    void testParseLocations() throws IOException, ParseException, ParserConfigurationException, SAXException {
         String filePath = "config" + File.separator + "basic-entities.dot";
-        parseLocation.parseGameDataFromFile(filePath);
+        parseLocation.parseGameEntitiesFromFile(filePath);
         System.out.println(parseLocation.getLocation("cabin").getDescription());
+        String actionFilePath = "config" + File.separator + "basic-actions.xml";
+        parseLocation.parseActionsFromFile(actionFilePath);
+
     }
 }

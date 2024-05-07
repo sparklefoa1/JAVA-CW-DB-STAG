@@ -5,21 +5,28 @@ import com.alexmerz.graphviz.ParseException;
 import com.alexmerz.graphviz.objects.Graph;
 import com.alexmerz.graphviz.objects.Node;
 import com.alexmerz.graphviz.objects.Edge;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GameData {
     private Map<String, Locations> locations;
     private List<String[]> paths;
+    private HashMap<String, HashSet<GameAction>> actions;
     public GameData() {
         locations = new HashMap<>();
         paths = new ArrayList<>();
+        actions = new HashMap<String, HashSet<GameAction>>();
     }
     // 添加位置
     public void addLocation(String name, String description) {
@@ -67,7 +74,7 @@ public class GameData {
     }
 
     // parse & store game data
-    public void parseGameDataFromFile(String filePath) throws FileNotFoundException, IOException, ParseException {
+    public void parseGameEntitiesFromFile(String filePath) throws FileNotFoundException, IOException, ParseException {
         Parser parser = new Parser();
         FileReader reader = null;
         BufferedReader bufferedReader = null;
@@ -138,6 +145,31 @@ public class GameData {
             if (reader != null) {
                 reader.close();
             }
+        }
+    }
+    public void parseActionsFromFile(String filePath) throws ParserConfigurationException, SAXException, IOException {
+        try {
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document document = builder.parse(filePath);
+            Element root = document.getDocumentElement();
+            NodeList actionNodes = root.getChildNodes();
+            for (int i = 0; i < actionNodes.getLength(); i++) {
+                if(i % 2 != 0) {
+                    Element actionElement = (Element) actionNodes.item(i);
+                    Element triggers = (Element) actionElement.getElementsByTagName("triggers").item(0);
+                    NodeList triggerKeyphraseNodes = triggers.getChildNodes();
+                    for (int j = 0 ; j < triggerKeyphraseNodes.getLength(); j++){
+                        if(j % 2 != 0) {
+                            Element triggerKeyphrase = (Element) triggerKeyphraseNodes.item(j);
+                            String triggerPhrase = triggerKeyphrase.getTextContent();
+                            System.out.println(triggerPhrase);
+                        }
+                    }
+                }
+            }
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            e.printStackTrace();
+            throw e; // Re-throwing the caught exception
         }
     }
    /* // 设置玩家
