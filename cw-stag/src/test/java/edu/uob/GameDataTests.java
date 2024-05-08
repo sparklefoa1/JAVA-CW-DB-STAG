@@ -26,6 +26,7 @@ public class GameDataTests {
     void testParseLocations() throws IOException, ParseException, ParserConfigurationException, SAXException {
         String filePath = "config" + File.separator + "basic-entities.dot";
         parseLocation.parseGameEntitiesFromFile(filePath);
+        System.out.println(parseLocation.getPlayer().getCurrentLocation().getAllCharacters());
         //System.out.println(parseLocation.getPlayer().getCurrentLocation().getName());
         //System.out.println(parseLocation.getLocation("cabin").getDescription());
         String actionFilePath = "config" + File.separator + "basic-actions.xml";

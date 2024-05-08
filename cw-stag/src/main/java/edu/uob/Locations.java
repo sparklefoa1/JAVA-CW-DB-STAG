@@ -1,43 +1,46 @@
 package edu.uob;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Locations extends GameEntity {
-    private List<String> artefacts;
-    private List<String> furniture;
-    private List<String> characters;
+    private Map<String, Artefacts> artefacts;
+    private Map<String, Furniture> furniture;
+    private Map<String, Characters> characters;
     public Locations(String name, String description) {
         super(name, description);
-        this.artefacts = new ArrayList<>();
-        this.furniture = new ArrayList<>();
-        this.characters = new ArrayList<>();
+        this.artefacts = new HashMap<>();
+        this.furniture = new HashMap<>();
+        this.characters = new HashMap<>();
     }
-    // 添加道具
+    // add artefact
     public void addArtefact(String artefactName, String artefactDescription) {
-        artefacts.add(artefactName + ": " + artefactDescription);
+        artefacts.put(artefactName, new Artefacts(artefactName, artefactDescription));
     }
 
-    // 添加家具
+    // add furniture
     public void addFurniture(String furnitureName, String furnitureDescription) {
-        furniture.add(furnitureName + ": " + furnitureDescription);
+        furniture.put(furnitureName, new Furniture(furnitureName, furnitureDescription));
     }
 
-    // 添加角色
+    // add character
     public void addCharacter(String characterName, String characterDescription) {
-        characters.add(characterName + ": " + characterDescription);
+        characters.put(characterName, new Characters(characterName, characterDescription));
     }
 
     // Getter
-    public List<String> getArtefacts() {
-        return artefacts;
+    public Artefacts getArtefacts(String arteFactName) {
+        return artefacts.get(arteFactName);
     }
+    public Map<String, Artefacts> getAllArtefacts() {return artefacts;}
 
-    public List<String> getFurniture() {
-        return furniture;
+    public Furniture getFurniture(String furnitureName) {
+        return furniture.get(furnitureName);
     }
+    public Map<String, Furniture> getAllFurniture() {return furniture;}
+    public Characters getCharacters(String characterName) {return characters.get(characterName);}
+    public Map<String, Characters> getAllCharacters() {return characters;}
 
-    public List<String> getCharacters() {
-        return characters;
-    }
 }

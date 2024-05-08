@@ -2,6 +2,7 @@ package edu.uob;
 
 public class GamePlayer {
     private Locations currentLocation;
+    private Locations storeroom;
 
     public void setInitialLocation(Locations initialLocation) {
         this.currentLocation = initialLocation;
@@ -11,5 +12,11 @@ public class GamePlayer {
     }
     public Locations getCurrentLocation() {
         return currentLocation;
+    }
+    public void setStoreroom(Locations storeroom) {
+        this.storeroom = storeroom;
+    }
+    public  Locations getStoreroom() {
+        return storeroom;
     }
 }

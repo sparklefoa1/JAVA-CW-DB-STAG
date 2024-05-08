@@ -10,7 +10,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public final class GameServer {
 
@@ -55,31 +57,76 @@ public final class GameServer {
     public String handleCommand(String command) {
         // TODO implement your server logic here
         command = command.toLowerCase();
-        // Initialize game
-        // Set current location作为玩家的属性？
-        //Locations currentLocation = gameData.getPlayer().getCurrentLocation();
         // Give response
-        // Basic commands
+        // Basic commands //同时输入很多命令会怎样？按顺序执行。。。？ use else?
         if(command.contains("inventory") || command.contains("inv")) {
-            String inventoryResult = String.join(System.lineSeparator(), gameData.getLocation("storeroom").getArtefacts());
+            Map<String, Artefacts> storeroomArtefacts = gameData.getPlayer().getStoreroom().getAllArtefacts();
+            List<String> inventoryArtefacts = new ArrayList<>();
+            for (Map.Entry<String, Artefacts> entry : storeroomArtefacts.entrySet()) {
+                //String artefactName = entry.getKey();
+                Artefacts artefact = entry.getValue();
+                inventoryArtefacts.add(artefact.getName());
+            }
+            String inventoryResult = String.join(System.lineSeparator(), inventoryArtefacts);
             return inventoryResult;
         }
         if(command.contains("get")){
 
-        }//同时输入很多命令会怎样？按顺序执行。。。？ use else?
+        }
         if(command.contains("drop")){
 
         }
         if(command.contains("goto")){
-
+            Locations currentLocation = gameData.getPlayer().getCurrentLocation();
+            List<String> currentPath = gameData.getPaths(currentLocation.getName());
+            for(String gotoPath : currentPath) {
+                if (command.contains(gotoPath)) {
+                    gameData.getPlayer().setCurrentLocation(gameData.getLocation(gotoPath));
+                    return "You have gone to the " + gotoPath;
+                }
+            }
+            return "You have nowhere to go";
         }
         if(command.contains("look")){
-            String currentLocationName = gameData.getPlayer().getCurrentLocation().getName();
-            List<String> currentPath = gameData.getPaths(currentLocationName);
-            String pathResult = String.join(System.lineSeparator(), currentPath);
-            return "You are in the " + currentLocationName + " now" + "and you can goto: " + System.lineSeparator() + pathResult;
+            List<String> lookResult = new ArrayList<>();
+            Locations currentLocation = gameData.getPlayer().getCurrentLocation();
+            lookResult.add("You are in the " + currentLocation.getName());
+            if(!currentLocation.getAllArtefacts().isEmpty()){
+                lookResult.add("There are artefacts: ");
+                Map<String, Artefacts> currentAllArtefacts = currentLocation.getAllArtefacts();
+                List<String> currentArtefacts = new ArrayList<>();
+                for (Map.Entry<String, Artefacts> entry : currentAllArtefacts.entrySet()) {
+                    Artefacts artefact = entry.getValue();
+                    currentArtefacts.add(artefact.getName());
+                }
+                lookResult.addAll(currentArtefacts);
+            }
+            if(!currentLocation.getAllFurniture().isEmpty()){
+                lookResult.add("There are furniture: ");
+                Map<String, Furniture> currentAllFurniture = currentLocation.getAllFurniture();
+                List<String> currentFurniture = new ArrayList<>();
+                for (Map.Entry<String, Furniture> entry : currentAllFurniture.entrySet()) {
+                    Furniture furniture = entry.getValue();
+                    currentFurniture.add(furniture.getName());
+                }
+                lookResult.addAll(currentFurniture);
+            }
+            if(!currentLocation.getAllCharacters().isEmpty()){
+                lookResult.add("There are Characters: ");
+                Map<String, Characters> currentAllCharacters = currentLocation.getAllCharacters();
+                List<String> currentCharacters = new ArrayList<>();
+                for (Map.Entry<String, Characters> entry : currentAllCharacters.entrySet()) {
+                    Characters character = entry.getValue();
+                    currentCharacters.add(character.getName());
+                }
+                lookResult.addAll(currentCharacters);
+            }
+            List<String> currentPath = gameData.getPaths(currentLocation.getName());
+            lookResult.add("And you can goto: ");
+            lookResult.addAll(currentPath);
+            return String.join(System.lineSeparator(), lookResult);
         }
-        return "Invalid command.";
+        return "Invalid command";
     }
 
     /**

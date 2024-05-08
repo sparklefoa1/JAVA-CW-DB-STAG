@@ -30,6 +30,7 @@ public class GameData {
     public void setInitialLocation(String initialLocationName) {
         Locations initialLocation = getLocation(initialLocationName);
         player.setInitialLocation(initialLocation);
+        player.setStoreroom(getLocation("storeroom"));
     }
     public GamePlayer getPlayer() {
         return player;
@@ -139,7 +140,7 @@ public class GameData {
                 }
 
             }
-            // Keep initialize player location
+            // Keep initialize player location & storeroom
             setInitialLocation(firstLocationName);
             // store paths
             ArrayList<Edge> paths = sections.get(1).getEdges();
