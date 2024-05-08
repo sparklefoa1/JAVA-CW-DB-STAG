@@ -17,8 +17,22 @@ public class GameAction {
         this.producedEntities = producedEntities;
         this.narration = narration;
     }
+    public List<String> getTriggerKeyphrases() {
+        return triggerKeyphrases;
+    }
     public List<String> getSubjectEntities()
     {
         return subjectEntities;
+    }
+    public List<String> getConsumedEntities() {
+        return consumedEntities;
+    }
+
+    public List<String> getProducedEntities() {
+        return producedEntities;
+    }
+
+    public String getNarration() {
+        return narration;
     }
 }
