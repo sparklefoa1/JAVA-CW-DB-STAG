@@ -26,7 +26,13 @@ public class GameDataTests {
     void testParseLocations() throws IOException, ParseException, ParserConfigurationException, SAXException {
         String filePath = "config" + File.separator + "basic-entities.dot";
         parseLocation.parseGameEntitiesFromFile(filePath);
-        System.out.println(parseLocation.getPlayer().getCurrentLocation().getAllCharacters());
+        String artefactName = "axe";
+        Artefacts artefact = new Artefacts("axe", "A razor sharp axe");
+        parseLocation.getPlayer().getStoreroom().addArtefact(artefactName, String.valueOf(artefact));
+        parseLocation.getPlayer().getCurrentLocation().getAllArtefacts().remove(artefactName);
+        System.out.println(parseLocation.getPlayer().getStoreroom().getAllArtefacts());
+        System.out.println(parseLocation.getPlayer().getCurrentLocation().getAllArtefacts());
+        //System.out.println(parseLocation.getPlayer().getCurrentLocation().getAllCharacters());
         //System.out.println(parseLocation.getPlayer().getCurrentLocation().getName());
         //System.out.println(parseLocation.getLocation("cabin").getDescription());
         String actionFilePath = "config" + File.separator + "basic-actions.xml";

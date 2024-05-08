@@ -71,10 +71,30 @@ public final class GameServer {
             return inventoryResult;
         }
         if(command.contains("get")){
-
+            Map<String, Artefacts> currentAllArtefacts = gameData.getPlayer().getCurrentLocation().getAllArtefacts();
+            for (Map.Entry<String, Artefacts> entry : currentAllArtefacts.entrySet()) {
+                String artefactName = entry.getKey();
+                Artefacts artefact = entry.getValue();
+                if(command.contains(artefactName)){
+                    gameData.getPlayer().getStoreroom().addArtefact(artefactName, artefact.getDescription());
+                    currentAllArtefacts.remove(artefactName);
+                    return "You get " + artefactName + " from the " + gameData.getPlayer().getCurrentLocation().getName();
+                }
+            }
+            return "You cannot get this artefact";
         }
         if(command.contains("drop")){
-
+            Map<String, Artefacts> storeroomArtefacts = gameData.getPlayer().getStoreroom().getAllArtefacts();
+            for (Map.Entry<String, Artefacts> entry : storeroomArtefacts.entrySet()) {
+                String artefactName = entry.getKey();
+                Artefacts artefact = entry.getValue();
+                if(command.contains(artefactName)){
+                    gameData.getPlayer().getCurrentLocation().addArtefact(artefactName, artefact.getDescription());
+                    storeroomArtefacts.remove(artefactName);
+                    return "You drop " + artefactName + " to the " + gameData.getPlayer().getCurrentLocation().getName();
+                }
+            }
+            return "You do not have this artefact";
         }
         if(command.contains("goto")){
             Locations currentLocation = gameData.getPlayer().getCurrentLocation();
@@ -85,19 +105,19 @@ public final class GameServer {
                     return "You have gone to the " + gotoPath;
                 }
             }
-            return "You have nowhere to go";
+            return "You cannot go to there";
         }
         if(command.contains("look")){
             List<String> lookResult = new ArrayList<>();
             Locations currentLocation = gameData.getPlayer().getCurrentLocation();
-            lookResult.add("You are in the " + currentLocation.getName());
+            lookResult.add("You are in the " + currentLocation.getName() + ": " + currentLocation.getDescription());
             if(!currentLocation.getAllArtefacts().isEmpty()){
                 lookResult.add("There are artefacts: ");
                 Map<String, Artefacts> currentAllArtefacts = currentLocation.getAllArtefacts();
                 List<String> currentArtefacts = new ArrayList<>();
                 for (Map.Entry<String, Artefacts> entry : currentAllArtefacts.entrySet()) {
                     Artefacts artefact = entry.getValue();
-                    currentArtefacts.add(artefact.getName());
+                    currentArtefacts.add(artefact.getName() + ": " + artefact.getDescription());
                 }
                 lookResult.addAll(currentArtefacts);
             }
@@ -107,7 +127,7 @@ public final class GameServer {
                 List<String> currentFurniture = new ArrayList<>();
                 for (Map.Entry<String, Furniture> entry : currentAllFurniture.entrySet()) {
                     Furniture furniture = entry.getValue();
-                    currentFurniture.add(furniture.getName());
+                    currentFurniture.add(furniture.getName() + ": " + furniture.getDescription());
                 }
                 lookResult.addAll(currentFurniture);
             }
@@ -117,7 +137,7 @@ public final class GameServer {
                 List<String> currentCharacters = new ArrayList<>();
                 for (Map.Entry<String, Characters> entry : currentAllCharacters.entrySet()) {
                     Characters character = entry.getValue();
-                    currentCharacters.add(character.getName());
+                    currentCharacters.add(character.getName() + ": " + character.getDescription());
                 }
                 lookResult.addAll(currentCharacters);
             }
