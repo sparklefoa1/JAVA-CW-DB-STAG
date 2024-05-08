@@ -2,7 +2,9 @@ package edu.uob;
 
 import org.w3c.dom.Element;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class GameAction {
     private List<String> triggerKeyphrases;

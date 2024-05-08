@@ -59,6 +59,13 @@ public final class GameServer {
         command = command.toLowerCase();
         // Give response
         // Basic commands //同时输入很多命令会怎样？按顺序执行。。。？ use else?
+        String result = basicCommand(command);
+        if(!result.equalsIgnoreCase("Not basic command")) {
+            return result;
+        }
+        return "";
+    }
+    public String basicCommand(String command) {
         if(command.contains("inventory") || command.contains("inv")) {
             Map<String, Artefacts> storeroomArtefacts = gameData.getPlayer().getStoreroom().getAllArtefacts();
             List<String> inventoryArtefacts = new ArrayList<>();
@@ -146,7 +153,7 @@ public final class GameServer {
             lookResult.addAll(currentPath);
             return String.join(System.lineSeparator(), lookResult);
         }
-        return "Invalid command";
+        return "Not basic command";
     }
 
     /**
