@@ -26,7 +26,7 @@ public class GameData {
     public GameData() {
         locations = new HashMap<>();
         paths = new ArrayList<>();
-        actions = new HashMap<String, HashSet<GameAction>>();
+        actions = new HashMap<>();
     }
     // 添加位置
     public void addLocation(String name, String description) {
@@ -147,6 +147,18 @@ public class GameData {
             }
         }
     }
+
+    /*public GameAction getGameAction(String triggerPhrase) {
+        HashSet<GameAction> actionSet = actions.get(triggerPhrase);
+        // 如果不存在这个 triggerPhrase 对应的动作集合，则返回 null
+        if (actionSet == null || actionSet.isEmpty()) {
+            return null;
+        }
+        return actionSet.iterator().next();//返回第一个动作对象
+    }*/
+    public HashSet<GameAction> getGameActions(String triggerKeyphrase) {
+        return actions.get(triggerKeyphrase);
+    }
     public void parseActionsFromFile(String filePath) throws ParserConfigurationException, SAXException, IOException {
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -156,16 +168,65 @@ public class GameData {
             for (int i = 0; i < actionNodes.getLength(); i++) {
                 if(i % 2 != 0) {
                     Element actionElement = (Element) actionNodes.item(i);
+
                     Element triggers = (Element) actionElement.getElementsByTagName("triggers").item(0);
-                    NodeList triggerKeyphraseNodes = triggers.getChildNodes();
-                    for (int j = 0 ; j < triggerKeyphraseNodes.getLength(); j++){
+                    NodeList triggerNodes = triggers.getChildNodes();
+                    List<String> triggerKeyphrases = new ArrayList<>();
+                    for (int j = 0 ; j < triggerNodes.getLength(); j++){
                         if(j % 2 != 0) {
-                            Element triggerKeyphrase = (Element) triggerKeyphraseNodes.item(j);
-                            String triggerPhrase = triggerKeyphrase.getTextContent();
-                            System.out.println(triggerPhrase);
+                            triggerKeyphrases.add(triggerNodes.item(j).getTextContent());
                         }
                     }
+                    /*for (String phrase : triggerKeyphrases) {
+                        System.out.println(phrase);
+                    }*/
+                    Element subjects = (Element) actionElement.getElementsByTagName("subjects").item(0);
+                    NodeList subjectNodes = subjects.getChildNodes();
+                    List<String> subjectEntities = new ArrayList<>();
+                    for (int j = 0 ; j < subjectNodes.getLength(); j++){
+                        if(j % 2 != 0) {
+                            subjectEntities.add(subjectNodes.item(j).getTextContent());
+                        }
+                    }
+                    /*for (String phrase : subjectEntities) {
+                        System.out.println(phrase);
+                    }*/
+                    Element consumed = (Element) actionElement.getElementsByTagName("consumed").item(0);
+                    NodeList consumedNodes = consumed.getChildNodes();
+                    List<String> consumedEntities = new ArrayList<>();
+                    for (int j = 0 ; j < consumedNodes.getLength(); j++){
+                        if(j % 2 != 0) {
+                            consumedEntities.add(consumedNodes.item(j).getTextContent());
+                        }
+                    }
+                    /*for (String phrase : consumedEntities) {
+                        System.out.println(phrase);
+                    }*/
+                    Element produced = (Element) actionElement.getElementsByTagName("produced").item(0);
+                    NodeList producedNodes = produced.getChildNodes();
+                    List<String> producedEntities = new ArrayList<>();
+                    for (int j = 0 ; j < producedNodes.getLength(); j++){
+                        if(j % 2 != 0) {
+                            producedEntities.add(producedNodes.item(j).getTextContent());
+                        }
+                    }
+                    /*for (String phrase : producedEntities) {
+                        System.out.println(phrase);
+                    }*/
+                    String narration = actionElement.getElementsByTagName("narration").item(0).getTextContent();
+                    //System.out.println(narration);
+
+                    //store actions triggers
+                    GameAction gameAction = new GameAction(triggerKeyphrases, subjectEntities, consumedEntities, producedEntities, narration);
+                    // Add the action to actions map
+                    for (String trigger : triggerKeyphrases) {
+                        if (!actions.containsKey(trigger)) {
+                            actions.put(trigger, new HashSet<>());
+                        }
+                        actions.get(trigger).add(gameAction);
+                    }
                 }
+
             }
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();

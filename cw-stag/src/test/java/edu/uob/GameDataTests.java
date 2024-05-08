@@ -9,10 +9,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 public class GameDataTests {
     private GameData parseLocation;
+    private List<String> subjects;
 
     @BeforeEach
     void setUp() {
@@ -26,6 +29,13 @@ public class GameDataTests {
         System.out.println(parseLocation.getLocation("cabin").getDescription());
         String actionFilePath = "config" + File.separator + "basic-actions.xml";
         parseLocation.parseActionsFromFile(actionFilePath);
-
+        HashSet<GameAction> openAction = parseLocation.getGameActions("cut");
+        for (GameAction gameAction : openAction) {
+            // 获取当前 GameAction 对象的 subjects
+            List<String> subjects = gameAction.getSubjectEntities();
+            for (String subject : subjects) {
+                System.out.println(subject);
+            }
+        }
     }
 }
