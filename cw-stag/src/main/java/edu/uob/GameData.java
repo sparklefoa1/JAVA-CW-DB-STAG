@@ -13,64 +13,74 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public class GameData {
+    private GamePlayer player;
     private Map<String, Locations> locations;
     private List<String[]> paths;
     private HashMap<String, HashSet<GameAction>> actions;
     public GameData() {
+        player = new GamePlayer();
         locations = new HashMap<>();
         paths = new ArrayList<>();
         actions = new HashMap<>();
     }
-    // 添加位置
+    public void setInitialLocation(String initialLocationName) {
+        Locations initialLocation = getLocation(initialLocationName);
+        player.setInitialLocation(initialLocation);
+    }
+    public GamePlayer getPlayer() {
+        return player;
+    }
+    // add location
     public void addLocation(String name, String description) {
         locations.put(name, new Locations(name, description));
     }
-    // 添加道具
+    // add artefact
     public void addArtefact(String locationName, String artefactName, String artefactDescription) {
         Locations location = locations.get(locationName);
         if (location != null) {
             location.addArtefact(artefactName, artefactDescription);
         }
     }
-    // 添加家具
+    // add furniture
     public void addFurniture(String locationName, String furnitureName, String furnitureDescription) {
         Locations location = locations.get(locationName);
         if (location != null) {
             location.addFurniture(furnitureName, furnitureDescription);
         }
     }
-    // 添加角色
+    // add character
     public void addCharacter(String locationName, String characterName, String characterDescription) {
         Locations location = locations.get(locationName);
         if (location != null) {
             location.addCharacter(characterName, characterDescription);
         }
     }
-    // 添加路径
+    // add path
     public void addPath(String from, String to) {
         paths.add(new String[]{from, to});
     }
 
-    // 获取位置
-    public Locations getLocation(String name) {
-        return locations.get(name);
-    }
+    // Get locations
+    public Locations getLocation(String name) {return locations.get(name);}
 
-    // 获取所有位置
+    // Get all locations
     public Map<String, Locations> getAllLocations() {
         return locations;
     }
 
-    // 获取路径
-    public List<String[]> getPaths() {
-        return paths;
+    // get path
+    public List<String> getPaths(String fromName) {
+        List<String> toLocations = new ArrayList<>();
+        for (String[] path : paths) {
+            if (path[0].equals(fromName)) {
+                toLocations.add(path[1]);
+            }
+        }
+        return toLocations;
     }
 
     // parse & store game data
@@ -84,8 +94,13 @@ public class GameData {
             Graph wholeDocument = parser.getGraphs().get(0);
             ArrayList<Graph> sections = wholeDocument.getSubgraphs();
 
-            // store locations & its contents
+            // Store locations & its contents
             ArrayList<Graph> locations = sections.get(0).getSubgraphs();
+            // Initialize player location
+            Graph firstLocation = locations.get(0);
+            Node firstLocationDetails = firstLocation.getNodes(false).get(0);
+            String firstLocationName = firstLocationDetails.getId().getId();
+            // Keep store locations & its contents
             for (Graph locationGraph : locations) {
                 Node locationDetails = locationGraph.getNodes(false).get(0);
                 String locationName = locationDetails.getId().getId();
@@ -101,7 +116,6 @@ public class GameData {
                         for (Node artefactsNode : artefactsNodes) {
                             String artefactsName = artefactsNode.getId().getId();
                             String artefactsDescription = artefactsNode.getAttribute("description");
-                            // 将道具数据存储到GameData实例中，并与对应的位置关联
                             addArtefact(locationName, artefactsName, artefactsDescription);
                             //System.out.println(artefactsName + " " + artefactsDescription);
                         }
@@ -110,7 +124,6 @@ public class GameData {
                         for (Node furnitureNode : furnitureNodes) {
                             String furnitureName = furnitureNode.getId().getId();
                             String furnitureDescription = furnitureNode.getAttribute("description");
-                            // 将家具数据存储到GameData实例中，并与对应的位置关联
                             addFurniture(locationName, furnitureName, furnitureDescription);
                             //System.out.println(furnitureName + " " + furnitureDescription);
                         }
@@ -119,7 +132,6 @@ public class GameData {
                         for (Node charactersNode : charactersNodes) {
                             String charactersName = charactersNode.getId().getId();
                             String charactersDescription = charactersNode.getAttribute("description");
-                            // 将角色数据存储到GameData实例中，并与对应的位置关联
                             addCharacter(locationName, charactersName, charactersDescription);
                             //System.out.println(charactersName + " " + charactersDescription);
                         }
@@ -127,6 +139,8 @@ public class GameData {
                 }
 
             }
+            // Keep initialize player location
+            setInitialLocation(firstLocationName);
             // store paths
             ArrayList<Edge> paths = sections.get(1).getEdges();
             for (Edge path : paths) {
@@ -134,9 +148,7 @@ public class GameData {
                 String fromName = fromLocation.getId().getId();
                 Node toLocation = path.getTarget().getNode();
                 String toName = toLocation.getId().getId();
-                // 将路径数据存储到GameData实例中
                 addPath(fromName, toName);
-                //System.out.println(fromName + " " + toName);
             }
         } finally {
             if (bufferedReader != null) {
@@ -233,12 +245,4 @@ public class GameData {
             throw e; // Re-throwing the caught exception
         }
     }
-   /* // 设置玩家
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
-    // 获取玩家
-    public Player getPlayer() {
-        return player;
-    }*/
 }

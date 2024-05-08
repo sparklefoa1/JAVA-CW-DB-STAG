@@ -8,11 +8,14 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 public final class GameServer {
 
     private static final char END_OF_TRANSMISSION = 4;
+    private GameData gameData;
 
     public static void main(String[] args) throws IOException {
         File entitiesFile = Paths.get("config" + File.separator + "basic-entities.dot").toAbsolutePath().toFile();
@@ -30,11 +33,17 @@ public final class GameServer {
     */
     public GameServer(File entitiesFile, File actionsFile) {
         // TODO implement your server logic here
-        // Initialize game:
-        // Load data
-
-        // Initialize GameEntities
-        // Set Action logics
+        // Initialize game & load game data
+        gameData = new GameData();
+        try {
+            String entitiesFilePath = entitiesFile.getAbsolutePath();
+            String actionsFilePath = actionsFile.getAbsolutePath();
+            gameData.parseGameEntitiesFromFile(entitiesFilePath);
+            gameData.parseActionsFromFile(actionsFilePath);
+        } catch (Exception e) {
+            throw new RuntimeException();
+            //e.printStackTrace();
+        }
     }
 
     /**
@@ -45,7 +54,32 @@ public final class GameServer {
     */
     public String handleCommand(String command) {
         // TODO implement your server logic here
-        return "";
+        command = command.toLowerCase();
+        // Initialize game
+        // Set current location作为玩家的属性？
+        //Locations currentLocation = gameData.getPlayer().getCurrentLocation();
+        // Give response
+        // Basic commands
+        if(command.contains("inventory") || command.contains("inv")) {
+            String inventoryResult = String.join(System.lineSeparator(), gameData.getLocation("storeroom").getArtefacts());
+            return inventoryResult;
+        }
+        if(command.contains("get")){
+
+        }//同时输入很多命令会怎样？按顺序执行。。。？ use else?
+        if(command.contains("drop")){
+
+        }
+        if(command.contains("goto")){
+
+        }
+        if(command.contains("look")){
+            String currentLocationName = gameData.getPlayer().getCurrentLocation().getName();
+            List<String> currentPath = gameData.getPaths(currentLocationName);
+            String pathResult = String.join(System.lineSeparator(), currentPath);
+            return "You are in the " + currentLocationName + " now" + "and you can goto: " + System.lineSeparator() + pathResult;
+        }
+        return "Invalid command.";
     }
 
     /**

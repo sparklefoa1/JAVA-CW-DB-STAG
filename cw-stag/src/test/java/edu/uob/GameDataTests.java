@@ -26,16 +26,17 @@ public class GameDataTests {
     void testParseLocations() throws IOException, ParseException, ParserConfigurationException, SAXException {
         String filePath = "config" + File.separator + "basic-entities.dot";
         parseLocation.parseGameEntitiesFromFile(filePath);
-        System.out.println(parseLocation.getLocation("cabin").getDescription());
+        //System.out.println(parseLocation.getPlayer().getCurrentLocation().getName());
+        //System.out.println(parseLocation.getLocation("cabin").getDescription());
         String actionFilePath = "config" + File.separator + "basic-actions.xml";
         parseLocation.parseActionsFromFile(actionFilePath);
         HashSet<GameAction> openAction = parseLocation.getGameActions("cut");
-        for (GameAction gameAction : openAction) {
+        /*for (GameAction gameAction : openAction) {
             // 获取当前 GameAction 对象的 subjects
             List<String> subjects = gameAction.getSubjectEntities();
             for (String subject : subjects) {
                 System.out.println(subject);
             }
-        }
+        }*/
     }
 }
