@@ -27,6 +27,20 @@ public class GameData {
         paths = new ArrayList<>();
         actions = new HashMap<>();
     }
+    public String gameOver() {
+        if (player.getHealth() == 0) {
+            Map<String, Artefacts> carryListArtefacts = player.getCarryList().getAllArtefacts();
+            for (Map.Entry<String, Artefacts> entry : carryListArtefacts.entrySet()) {
+                Artefacts artefact = entry.getValue();
+                player.getCurrentLocation().addArtefact(artefact.getName(), artefact.getDescription());
+            }
+            carryListArtefacts.clear();
+            Locations initialLocation = player.getInitial();
+            player.setCurrentLocation(initialLocation);
+            return "You died and lost all of your items, you must return to the start of the game";
+        }
+        return "You are alive";
+    }
     public void setInitialLocation(String initialLocationName) {
         Locations initialLocation = getLocation(initialLocationName);
         player.setInitialLocation(initialLocation);

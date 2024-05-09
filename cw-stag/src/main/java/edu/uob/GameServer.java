@@ -56,7 +56,7 @@ public final class GameServer {
         // TODO implement your server logic here
         command = command.toLowerCase();
         // Give response
-        // Basic commands //同时输入很多命令会怎样？按顺序执行。。。？ use else?
+        // Basic commands
         String result = basicCommand(command);
         if(!result.equalsIgnoreCase("Not basic command")) {
             return result;
@@ -70,6 +70,10 @@ public final class GameServer {
                 String actionResult = checkMatch(trigger);
                 return actionResult;
             }
+        }
+        // Health command
+        if(command.contains("health")){
+            return "Your current health level is: " + Integer.toString(gameData.getPlayer().getHealth());
         }
         return "";
     }
@@ -128,13 +132,8 @@ public final class GameServer {
                             }
                         }
                         containsInLists.put(actionConsumed, containLists);
-                        /*if (actionConsumeds.contains("health")) {
-                            containLists.add("health");
-                            containsInLists.put(actionConsumed, containLists);
-                        }*/
                     }
                     for (Map.Entry<String, List<String>> entry : containsInLists.entrySet()) {
-                        //String consumed = entry.getKey();
                         List<String> consumed = entry.getValue();
                         if (consumed.contains("locations")) {
                             for (String path : currentPath) {
@@ -187,6 +186,12 @@ public final class GameServer {
                             }
                         }
                         //health
+                        if (consumed.contains("health")) {
+                            gameData.getPlayer().setHealth(false);
+                            if(gameData.gameOver().contains("died")){
+                                return gameData.gameOver();
+                            }
+                        }
                     }
                     if (gameSubjects.containsAll(actionConsumeds)) {
                         // Check produced
@@ -211,6 +216,13 @@ public final class GameServer {
                         currentStoreroom.addAll(storeroomFurniture);
                         currentStoreroom.addAll(storeroomCharacters);
                         elementLists.put("storeroom", currentStoreroom);
+                        List<String> possiblePath = new ArrayList<>();
+                        for (int i = 0; i < gameData.getAllPaths().size(); i++) {
+                            String[] pathSet = gameData.getAllPaths().get(i);
+                            possiblePath.add(pathSet[0]);
+                            possiblePath.add(pathSet[1]);
+                        }
+                        elementLists.put("locations", possiblePath);
                         List<String> actionProduceds = action.getProducedEntities();
                         containsInLists.clear();
                         for (String actionProduce : actionProduceds) {
@@ -264,6 +276,9 @@ public final class GameServer {
                                     }
                                 }
                                 //health
+                                if (produced.contains("health")) {
+                                    gameData.getPlayer().setHealth(true);
+                                }
                             }
                         }
                         narration = action.getNarration();
