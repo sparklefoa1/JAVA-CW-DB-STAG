@@ -2,7 +2,7 @@ package edu.uob;
 
 public class GamePlayer {
     private Locations currentLocation;
-    private Locations storeroom;
+    private Locations carryList;
 
     public void setInitialLocation(Locations initialLocation) {
         this.currentLocation = initialLocation;
@@ -13,10 +13,10 @@ public class GamePlayer {
     public Locations getCurrentLocation() {
         return currentLocation;
     }
-    public void setStoreroom(Locations storeroom) {
-        this.storeroom = storeroom;
+    public void setCarryList(Locations carryList) {
+        this.carryList = carryList;
     }
-    public  Locations getStoreroom() {
-        return storeroom;
+    public  Locations getCarryList() {
+        return carryList;
     }
 }

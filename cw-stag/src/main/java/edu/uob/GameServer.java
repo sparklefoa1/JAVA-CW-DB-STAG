@@ -10,9 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class GameServer {
 
@@ -63,13 +61,35 @@ public final class GameServer {
         if(!result.equalsIgnoreCase("Not basic command")) {
             return result;
         }
+        // Other actions command
+        HashMap<String, HashSet<GameAction>> gameActions = gameData.getAllActions();
+        for (HashMap.Entry<String, HashSet<GameAction>> entry : gameActions.entrySet()) {
+            String trigger = entry.getKey();
+            //HashSet<GameAction> actions = entry.getValue();
+            //if(command.contains(trigger)){
+
+            //}
+        }
         return "";
+    }
+    public Boolean checkMatch(String trigger) {
+        HashSet<GameAction> actionSet = gameData.getGameActions(trigger);
+        List<String> items = new ArrayList<>();
+        for (GameAction action : actionSet) {
+            items.addAll(action.getSubjectEntities());
+        }
+        /*for (String item : items) {
+            if(item.equalsIgnoreCase()){
+
+            }
+        }*/
+        return false;
     }
     public String basicCommand(String command) {
         if(command.contains("inventory") || command.contains("inv")) {
-            Map<String, Artefacts> storeroomArtefacts = gameData.getPlayer().getStoreroom().getAllArtefacts();
+            Map<String, Artefacts> carryListArtefacts = gameData.getPlayer().getCarryList().getAllArtefacts();
             List<String> inventoryArtefacts = new ArrayList<>();
-            for (Map.Entry<String, Artefacts> entry : storeroomArtefacts.entrySet()) {
+            for (Map.Entry<String, Artefacts> entry : carryListArtefacts.entrySet()) {
                 //String artefactName = entry.getKey();
                 Artefacts artefact = entry.getValue();
                 inventoryArtefacts.add(artefact.getName());
@@ -83,7 +103,7 @@ public final class GameServer {
                 String artefactName = entry.getKey();
                 Artefacts artefact = entry.getValue();
                 if(command.contains(artefactName)){
-                    gameData.getPlayer().getStoreroom().addArtefact(artefactName, artefact.getDescription());
+                    gameData.getPlayer().getCarryList().addArtefact(artefactName, artefact.getDescription());
                     currentAllArtefacts.remove(artefactName);
                     return "You get " + artefactName + " from the " + gameData.getPlayer().getCurrentLocation().getName();
                 }
@@ -91,7 +111,7 @@ public final class GameServer {
             return "You cannot get this artefact";
         }
         if(command.contains("drop")){
-            Map<String, Artefacts> storeroomArtefacts = gameData.getPlayer().getStoreroom().getAllArtefacts();
+            Map<String, Artefacts> storeroomArtefacts = gameData.getPlayer().getCarryList().getAllArtefacts();
             for (Map.Entry<String, Artefacts> entry : storeroomArtefacts.entrySet()) {
                 String artefactName = entry.getKey();
                 Artefacts artefact = entry.getValue();

@@ -30,7 +30,8 @@ public class GameData {
     public void setInitialLocation(String initialLocationName) {
         Locations initialLocation = getLocation(initialLocationName);
         player.setInitialLocation(initialLocation);
-        player.setStoreroom(getLocation("storeroom"));
+        Locations initialCarryList = new Locations("carryList", "A player's carryList");
+        player.setCarryList(initialCarryList);
     }
     public GamePlayer getPlayer() {
         return player;
@@ -171,6 +172,9 @@ public class GameData {
     }*/
     public HashSet<GameAction> getGameActions(String triggerKeyphrase) {
         return actions.get(triggerKeyphrase);
+    }
+    public HashMap<String, HashSet<GameAction>> getAllActions() {
+        return actions;
     }
     public void parseActionsFromFile(String filePath) throws ParserConfigurationException, SAXException, IOException {
         try {
