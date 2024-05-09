@@ -66,24 +66,216 @@ public final class GameServer {
         for (HashMap.Entry<String, HashSet<GameAction>> entry : gameActions.entrySet()) {
             String trigger = entry.getKey();
             //HashSet<GameAction> actions = entry.getValue();
-            //if(command.contains(trigger)){
-
-            //}
+            if(command.contains(trigger)){
+                String actionResult = checkMatch(trigger);
+                return actionResult;
+            }
         }
         return "";
     }
-    public Boolean checkMatch(String trigger) {
+    public String checkMatch(String trigger) {
         HashSet<GameAction> actionSet = gameData.getGameActions(trigger);
-        List<String> items = new ArrayList<>();
+        String narration = "Action failed";
+        // Check subjects
         for (GameAction action : actionSet) {
-            items.addAll(action.getSubjectEntities());
-        }
-        /*for (String item : items) {
-            if(item.equalsIgnoreCase()){
+            if(action.getTriggerKeyphrases().contains(trigger)) {
+                List<String> actionSubjects = new ArrayList<>();
+                actionSubjects.addAll(action.getSubjectEntities());
+                List<String> gameSubjects = new ArrayList<>();
+                Locations currentLocation = gameData.getPlayer().getCurrentLocation();
+                List<String> currentPath = gameData.getPaths(currentLocation.getName());
+                gameSubjects.addAll(currentPath);
+                List<String> currentArtefacts = new ArrayList<>();
+                for (Map.Entry<String, Artefacts> entry : currentLocation.getAllArtefacts().entrySet()) {
+                    currentArtefacts.add(entry.getKey());
+                }
+                gameSubjects.addAll(currentArtefacts);
+                List<String> currentFurniture = new ArrayList<>();
+                for (Map.Entry<String, Furniture> entry : currentLocation.getAllFurniture().entrySet()) {
+                    currentFurniture.add(entry.getKey());
+                }
+                gameSubjects.addAll(currentFurniture);
+                List<String> currentCharacters = new ArrayList<>();
+                for (Map.Entry<String, Characters> entry : currentLocation.getAllCharacters().entrySet()) {
+                    currentCharacters.add(entry.getKey());
+                }
+                gameSubjects.addAll(currentCharacters);
+                Map<String, Artefacts> carryListArtefacts = gameData.getPlayer().getCarryList().getAllArtefacts();
+                List<String> currentCarryLists = new ArrayList<>();
+                for (Map.Entry<String, Artefacts> entry : carryListArtefacts.entrySet()) {
+                    currentCarryLists.add(entry.getKey());
+                }
+                gameSubjects.addAll(currentCarryLists);
+                gameSubjects.add("health");
+                if (gameSubjects.containsAll(actionSubjects)) {
+                    // Check consumed
+                    List<String> actionConsumeds = action.getConsumedEntities();
+                    Map<String, List<String>> elementLists = new HashMap<>();
+                    elementLists.put("locations", currentPath);
+                    elementLists.put("artefacts", currentArtefacts);
+                    elementLists.put("furniture", currentFurniture);
+                    elementLists.put("characters", currentCharacters);
+                    elementLists.put("carryLists", currentCarryLists);
+                    List<String> healthList = new ArrayList<>();
+                    healthList.add("health");
+                    elementLists.put("health", healthList);
+                    Map<String, List<String>> containsInLists = new HashMap<>();
+                    for (String actionConsumed : actionConsumeds) {
+                        List<String> containLists = new ArrayList<>();
+                        for (Map.Entry<String, List<String>> entry : elementLists.entrySet()) {
+                            if (entry.getValue().contains(actionConsumed)) {
+                                containLists.add(entry.getKey());
+                            }
+                        }
+                        containsInLists.put(actionConsumed, containLists);
+                        /*if (actionConsumeds.contains("health")) {
+                            containLists.add("health");
+                            containsInLists.put(actionConsumed, containLists);
+                        }*/
+                    }
+                    for (Map.Entry<String, List<String>> entry : containsInLists.entrySet()) {
+                        //String consumed = entry.getKey();
+                        List<String> consumed = entry.getValue();
+                        if (consumed.contains("locations")) {
+                            for (String path : currentPath) {
+                                if (actionConsumeds.contains(path)) {
+                                    for (int i = 0; i < gameData.getAllPaths().size(); i++) {
+                                        String[] removePath = gameData.getAllPaths().get(i);
+                                        if (removePath[0].equals(currentLocation.getName()) && removePath[1].equals(path)) {
+                                            gameData.getAllPaths().remove(i);
+                                            i--;
+                                        }
+                                    }
+                                }
+                            }
 
+                        }
+                        if (consumed.contains("artefacts")) {
+                            for (String consumedArtefact : currentArtefacts) {
+                                if (actionConsumeds.contains(consumedArtefact)) {
+                                    Artefacts artefact = currentLocation.getArtefacts(consumedArtefact);
+                                    gameData.getLocation("storeroom").addArtefact(consumedArtefact, artefact.getDescription());
+                                    currentLocation.getAllArtefacts().remove(consumedArtefact);
+                                }
+                            }
+                        }
+                        if (consumed.contains("furniture")) {
+                            for (String consumedFurniture : currentFurniture) {
+                                if (actionConsumeds.contains(consumedFurniture)) {
+                                    Furniture furniture = currentLocation.getFurniture(consumedFurniture);
+                                    gameData.getLocation("storeroom").addFurniture(consumedFurniture, furniture.getDescription());
+                                    currentLocation.getAllFurniture().remove(consumedFurniture);
+                                }
+                            }
+                        }
+                        if (consumed.contains("characters")) {
+                            for (String consumedCharacter : currentCharacters) {
+                                if (actionConsumeds.contains(consumedCharacter)) {
+                                    Characters character = currentLocation.getCharacters(consumedCharacter);
+                                    gameData.getLocation("storeroom").addCharacter(consumedCharacter, character.getDescription());
+                                    currentLocation.getAllCharacters().remove(consumedCharacter);
+                                }
+                            }
+                        }
+                        if (consumed.contains("carryLists")) {
+                            for (String consumedCarrylist : currentCarryLists) {
+                                if (actionConsumeds.contains(consumedCarrylist)) {
+                                    Artefacts carryListArtefact = gameData.getPlayer().getCarryList().getArtefacts(consumedCarrylist);
+                                    gameData.getLocation("storeroom").addArtefact(carryListArtefact.getName(), carryListArtefact.getDescription());
+                                    gameData.getPlayer().getCarryList().getAllArtefacts().remove(consumedCarrylist);
+                                }
+                            }
+                        }
+                        //health
+                    }
+                    if (gameSubjects.containsAll(actionConsumeds)) {
+                        // Check produced
+                        Locations storeroom = gameData.getLocation("storeroom");
+                        List<String> storeroomArtefacts = new ArrayList<>();
+                        for (Map.Entry<String, Artefacts> entry : storeroom.getAllArtefacts().entrySet()) {
+                            storeroomArtefacts.add(entry.getKey());
+                        }
+                        gameSubjects.addAll(storeroomArtefacts);
+                        List<String> storeroomFurniture = new ArrayList<>();
+                        for (Map.Entry<String, Furniture> entry : storeroom.getAllFurniture().entrySet()) {
+                            storeroomFurniture.add(entry.getKey());
+                        }
+                        gameSubjects.addAll(storeroomFurniture);
+                        List<String> storeroomCharacters = new ArrayList<>();
+                        for (Map.Entry<String, Characters> entry : storeroom.getAllCharacters().entrySet()) {
+                            storeroomCharacters.add(entry.getKey());
+                        }
+                        gameSubjects.addAll(storeroomCharacters);
+                        List<String> currentStoreroom = new ArrayList<>();
+                        currentStoreroom.addAll(storeroomArtefacts);
+                        currentStoreroom.addAll(storeroomFurniture);
+                        currentStoreroom.addAll(storeroomCharacters);
+                        elementLists.put("storeroom", currentStoreroom);
+                        List<String> actionProduceds = action.getProducedEntities();
+                        containsInLists.clear();
+                        for (String actionProduce : actionProduceds) {
+                            List<String> containLists = new ArrayList<>();
+                            for (Map.Entry<String, List<String>> entry : elementLists.entrySet()) {
+                                if (entry.getValue().contains(actionProduce)) {
+                                    containLists.add(entry.getKey());
+                                }
+                            }
+                            containsInLists.put(actionProduce, containLists);
+                            if (actionProduceds.contains("health")) {
+                                containLists.add("health");
+                                containsInLists.put(actionProduce, containLists);
+                            }
+                            for (Map.Entry<String, List<String>> entry : containsInLists.entrySet()) {
+                                List<String> produced = entry.getValue();
+                                if (produced.contains("locations")) {
+                                    List<String> allPath = new ArrayList<>();
+                                    for (int i = 0; i < gameData.getAllPaths().size(); i++) {
+                                        String[] pathSet = gameData.getAllPaths().get(i);
+                                        allPath.add(pathSet[0]);
+                                        allPath.add(pathSet[1]);
+                                    }
+                                    for (String path : allPath) {
+                                        if (actionProduceds.contains(path)) {
+                                            gameData.addPath(currentLocation.getName(), path);
+                                        }
+                                    }
+                                }
+                                if (produced.contains("storeroom")) {
+                                    for (String producedArtefact : storeroomArtefacts) {
+                                        if (actionProduceds.contains(producedArtefact)) {
+                                            Artefacts artefact = storeroom.getArtefacts(producedArtefact);
+                                            currentLocation.addArtefact(artefact.getName(), artefact.getDescription());
+                                            storeroom.getAllArtefacts().remove(producedArtefact);
+                                        }
+                                    }
+                                    for (String producedFurniture : storeroomFurniture) {
+                                        if (actionProduceds.contains(producedFurniture)) {
+                                            Furniture furniture = storeroom.getFurniture(producedFurniture);
+                                            currentLocation.addFurniture(furniture.getName(), furniture.getDescription());
+                                            storeroom.getAllFurniture().remove(producedFurniture);
+                                        }
+                                    }
+                                    for (String producedCharacter : storeroomCharacters) {
+                                        if (actionProduceds.contains(producedCharacter)) {
+                                            Characters character = storeroom.getCharacters(producedCharacter);
+                                            currentLocation.addCharacter(character.getName(), character.getDescription());
+                                            storeroom.getAllCharacters().remove(producedCharacter);
+                                        }
+                                    }
+                                }
+                                //health
+                            }
+                        }
+                        narration = action.getNarration();
+                    } else {
+                        return "Missing consumed entities";
+                    }
+                } else {
+                    return "Missing subject entities";
+                }
             }
-        }*/
-        return false;
+        }
+        return narration;
     }
     public String basicCommand(String command) {
         if(command.contains("inventory") || command.contains("inv")) {

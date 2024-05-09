@@ -74,6 +74,8 @@ public class GameData {
         return locations;
     }
 
+    // set path
+    public void setPaths(List<String[]> paths) {this.paths = paths;}
     // get path
     public List<String> getPaths(String fromName) {
         List<String> toLocations = new ArrayList<>();
@@ -84,7 +86,10 @@ public class GameData {
         }
         return toLocations;
     }
-
+    // get all path
+    public List<String[]> getAllPaths() {
+        return paths;
+    }
     // parse & store game data
     public void parseGameEntitiesFromFile(String filePath) throws FileNotFoundException, IOException, ParseException {
         Parser parser = new Parser();
