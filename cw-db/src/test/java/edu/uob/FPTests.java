@@ -48,7 +48,7 @@ public class FPTests {
         try {
             Database db = fileParser.populateDatabase(filePath);
 
-            // 修改数据（例如，增加年龄）
+            // Modifying ages
             Table table = db.getTable("SampleTable");
             for (Row row : table.getRows()) {
                 Cell ageCell = row.getCell("Age");
@@ -58,7 +58,7 @@ public class FPTests {
                 }
             }
 
-            // 重新保存数据到文件
+            // Resaving data to file
             fileParser.saveDatabaseToFile(db, filePath);
 
         } catch (FileNotFoundException e) {
