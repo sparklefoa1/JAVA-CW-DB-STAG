@@ -3,7 +3,7 @@ package edu.uob;
 import java.io.File;
 import java.io.IOException;
 
-public class DataBase {
+public class DataBase0 {
     //private String databaseStoragePath;
     private String storagePath;
 

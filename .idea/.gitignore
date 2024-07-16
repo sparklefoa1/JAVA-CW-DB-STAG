@@ -6,7 +6,7 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
-/cw-db/
+/cw-stag/
 # Compiled and build-generated files
 *.class
 /target/
@@ -21,3 +21,12 @@
 *.tmp
 *.log
 *.bak
+
+# 7.15 new start
+/cw-db/other/
+/cw-db/databases/
+/cw-db/.mvn/
+/cw-db/target/
+/cw-db/mvnw/
+/cw-db/mvnw.cmd
+/cw-db/pom.xml

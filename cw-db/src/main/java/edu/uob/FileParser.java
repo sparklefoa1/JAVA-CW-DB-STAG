@@ -1,12 +1,86 @@
 package edu.uob;
 
 import java.io.*;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
-public class Parser {
-    public static void processTokens(ArrayList<String> tokens) {
+public class FileParser {
+
+    // Reading in the data from the sample data file using the Java File IO API
+    public List<String[]> readDataFromFile (String filePath) throws FileNotFoundException, IOException{
+        List<String[]> tabFile = new ArrayList<>();
+        File fileToRead = new File(filePath);
+        // Trying to read data of file
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(fileToRead))){
+            String fileLine;
+            // Reading data of file and print out
+            while ((fileLine = bufferedReader.readLine()) != null) {
+                // Printing out
+                System.out.println(fileLine);
+                // Getting data to string
+                String[] values = fileLine.split("\t");
+                tabFile.add(values);
+            }
+        }
+        return tabFile;
+    }
+
+    // Populating data to database
+    public Database populateDatabase(String filePath) throws FileNotFoundException, IOException {
+        Database db = new Database("SampleDB");
+        Table table = new Table("SampleTable");
+
+        List<String[]> data = readDataFromFile(filePath);
+
+        // 1st line is column names
+        String[] columnNames = data.get(0);
+        table.addColumn(new Column("id", "int")); // The 0 column is id
+        for (String columnName : columnNames) {
+            table.addColumn(new Column(columnName, "String")); // All data type is string
+        }
+
+        // Data rows begin from 2nd row
+        System.out.println(data.size());
+        for (int i = 1; i < data.size(); i++) {
+            String[] rowValues = data.get(i);
+            Row row = table.createNewRow(); // Generating an id when creating a new row
+            row.addCell("id", new Cell(String.valueOf(row.getId()))); // Adding id to the 1st cell in row
+            for (int j = 0; j < rowValues.length; j++) {
+                row.addCell(columnNames[j], new Cell(rowValues[j]));
+            }
+            table.addRow(row);
+        }
+
+        db.addTable(table);
+        return db;
+    }
+
+    // Saving data of database to file
+    public void saveDatabaseToFile(Database db, String filePath) throws IOException {
+        File fileToWrite = new File(filePath);
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileToWrite))) {
+            for (Table table : db.getTables()) {
+                // Writing column names
+                for (Column column : table.getColumns()) {
+                    bufferedWriter.write(column.getName() + "\t");
+                }
+                bufferedWriter.newLine();
+
+                // Writing data
+                for (Row row : table.getRows()) {
+                    for (Column column : table.getColumns()) {
+                        Cell cell = row.getCell(column.getName());
+                        if (cell != null) {
+                            bufferedWriter.write(cell.getValue() + "\t");
+                        }
+                    }
+                    bufferedWriter.newLine();
+                }
+            }
+        }
+    }
+
+    /*public static void processTokens(ArrayList<String> tokens) {
         if (containsIgnoreCase(tokens, "USE")) {
             DataBase currentDataBase = new DataBase();
             int index = findIndexIgnoreCase(tokens, "USE");
@@ -398,5 +472,5 @@ public class Parser {
             }
         }
         return false;
-    }
+    }*/
 }

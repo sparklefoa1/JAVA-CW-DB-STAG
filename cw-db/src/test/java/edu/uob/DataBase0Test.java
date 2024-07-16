@@ -3,12 +3,10 @@ package edu.uob;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.swing.*;
-
-public class DataBaseTest {
-    private DataBase database;
+public class DataBase0Test {
+    private DataBase0 database;
     private String databaseName = "Marks";
-    private Table table;
+    private Table0 table0;
     private String tableName = "marks";
     private String[] titleRow = {"id", "name", "mark", "pass"};
     private String[] insertRow = {"Bob", "21", "@bob.net"};
@@ -17,8 +15,8 @@ public class DataBaseTest {
     @BeforeEach
     public void setupDatabase() {
 
-        database = new DataBase();
-        table = new Table();
+        database = new DataBase0();
+        table0 = new Table0();
     }
 
     @Test
@@ -28,7 +26,7 @@ public class DataBaseTest {
         //TableModification.dropColumn("databases" + File.separator + "", "add");
         //TableModification.dropRow("databases" + File.separator + "", "Name", "Bob");
         database.createDatabase(databaseName);
-        table.createTable(tableName);
+        table0.createTable(tableName);
         //table.printOutFile();
         //TableModification.insertContentLine(table, titleRow);
         //TableModification.insertContentLine(table, insertRow);

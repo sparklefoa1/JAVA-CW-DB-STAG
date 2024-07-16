@@ -1,20 +1,18 @@
 package edu.uob;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class TablePrinter {
 
     // Print out whole table.
-    public static void printOutTable(Table currentTable) {
-        String tablePath = currentTable.getStoragePath();
+    public static void printOutTable(Table0 currentTable0) {
+        String tablePath = currentTable0.getStoragePath();
         try {
-            List<String> lines = readFile(currentTable.getStoragePath());
+            List<String> lines = readFile(currentTable0.getStoragePath());
             for (int i = 0; i < lines.size(); i++) {
                 String currentLine = lines.get(i);
                 String[] tokens = currentLine.split("\t");
@@ -26,10 +24,10 @@ public class TablePrinter {
     }
 
     // Print out special value/line.
-    public static void printOUtLine(Table currentTable, String directColumnName, String indexValue) {
-        String tablePath = currentTable.getStoragePath();
+    public static void printOUtLine(Table0 currentTable0, String directColumnName, String indexValue) {
+        String tablePath = currentTable0.getStoragePath();
         try {
-            List<String> lines = readFile(currentTable.getStoragePath());
+            List<String> lines = readFile(currentTable0.getStoragePath());
             // Analyse the table header and find the index of the column.
             int columnIndex = getColumnIndex(lines.get(0), directColumnName);
             String headerLine = lines.get(0);
@@ -49,10 +47,10 @@ public class TablePrinter {
         }
     }
 
-    public static void printOutLineWithCharacter(Table currentTable, String directColumnName, String characterToFind) {
-        String tablePath = currentTable.getStoragePath();
+    public static void printOutLineWithCharacter(Table0 currentTable0, String directColumnName, String characterToFind) {
+        String tablePath = currentTable0.getStoragePath();
         try {
-            List<String> lines = readFile(currentTable.getStoragePath());
+            List<String> lines = readFile(currentTable0.getStoragePath());
             // Analyse the table header and find the index of the column.
             int columnIndex = getColumnIndex(lines.get(0), directColumnName);
             String headerLine = lines.get(0);
@@ -72,10 +70,10 @@ public class TablePrinter {
         }
     }
 
-    public static void findColumnWithCharacter(Table currentTable, String directColumnName, String characterToFind) {
-        String tablePath = currentTable.getStoragePath();
+    public static void findColumnWithCharacter(Table0 currentTable0, String directColumnName, String characterToFind) {
+        String tablePath = currentTable0.getStoragePath();
         try {
-            List<String> lines = readFile(currentTable.getStoragePath());
+            List<String> lines = readFile(currentTable0.getStoragePath());
             boolean specialValue = false;
             // Analyse the table header and find the index of the column.
             int columnIndex = getColumnIndex(lines.get(0), directColumnName);
@@ -100,9 +98,9 @@ public class TablePrinter {
         }
     }
     // Find a column form the table.
-    public static void findColumn(Table currentTable, String headerName, String indexValue) {
+    public static void findColumn(Table0 currentTable0, String headerName, String indexValue) {
         try {
-            List<String> lines = readFile(currentTable.getStoragePath());
+            List<String> lines = readFile(currentTable0.getStoragePath());
             boolean specialValue = false;
 
             int columnIndex = getColumnIndex(lines.get(0), headerName);
@@ -128,9 +126,9 @@ public class TablePrinter {
             ioe.printStackTrace();
         }
     }
-    public static void findColumn(Table currentTable, String headerName) {
+    public static void findColumn(Table0 currentTable0, String headerName) {
         try {
-            List<String> lines = readFile(currentTable.getStoragePath());
+            List<String> lines = readFile(currentTable0.getStoragePath());
 
             int columnIndex = getColumnIndex(lines.get(0), headerName);
             char columnHeader = lines.get(0).charAt(columnIndex);
@@ -151,9 +149,9 @@ public class TablePrinter {
         }
     }
     // Find the special row needs to be printed.
-    public static void findIndex(Table currentTable, String indirectColumnName, String indexValue, String directColumnName) {
+    public static void findIndex(Table0 currentTable0, String indirectColumnName, String indexValue, String directColumnName) {
         try {
-            List<String> lines = readFile(currentTable.getStoragePath());
+            List<String> lines = readFile(currentTable0.getStoragePath());
             boolean specialValue = false;
             // Analyse the table header and indirectly find the index of the column to be printed.
             int basedColumnIndex = getColumnIndex(lines.get(0), indirectColumnName); // Indirect index the value to be printed.
@@ -181,10 +179,10 @@ public class TablePrinter {
         }
     }
 
-    public static void findIndexWithCharacter(Table currentTable, String indirectColumnName, String characterToFind, String directColumnName) {
-        String tablePath = currentTable.getStoragePath();
+    public static void findIndexWithCharacter(Table0 currentTable0, String indirectColumnName, String characterToFind, String directColumnName) {
+        String tablePath = currentTable0.getStoragePath();
         try {
-            List<String> lines = readFile(currentTable.getStoragePath());
+            List<String> lines = readFile(currentTable0.getStoragePath());
             boolean specialValue = false;
             // Analyse the table header and find the index of the column.
             int basedColumnIndex = getColumnIndex(lines.get(0), indirectColumnName); // Indirect index the value to be printed.

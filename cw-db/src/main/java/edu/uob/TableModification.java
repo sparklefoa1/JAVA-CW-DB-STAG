@@ -8,23 +8,23 @@ import java.util.List;
 public class TableModification {
 
     // Insert content line to the table.
-    public static void insertContentLine(Table currentTable, String[] contentLine) {
-        if (currentTable == null) {
+    public static void insertContentLine(Table0 currentTable0, String[] contentLine) {
+        if (currentTable0 == null) {
             System.err.println("The table is null.");
             return;
         }
         try {
-            List<String> lines = readFile(currentTable.getStoragePath());
+            List<String> lines = readFile(currentTable0.getStoragePath());
             int rowIndex;
-            int id = currentTable.getId();
+            int id = currentTable0.getId();
             if (lines.isEmpty()) {
                 // Insert at the beginning when the table is empty.
                 rowIndex = 0;
             } else {
                 // Insert at the end when the table is not empty.
                 rowIndex = lines.size();
-                id = currentTable.getId() + 1;
-                currentTable.setId(id);
+                id = currentTable0.getId() + 1;
+                currentTable0.setId(id);
             }
 
             StringBuilder newLine = new StringBuilder();
@@ -44,7 +44,7 @@ public class TableModification {
 
             lines.add(rowIndex, newLine.toString());
 
-            writeFile(currentTable.getStoragePath(), lines);
+            writeFile(currentTable0.getStoragePath(), lines);
             //System.out.println("[OK]");
         } catch (IOException ioe) {
             System.out.println("Can't insert the content: " + ioe.getMessage());
@@ -52,16 +52,16 @@ public class TableModification {
     }
 
     // Add a new header to the end.
-    public static void addNewHeader(Table currentTable, String headerName) {
+    public static void addNewHeader(Table0 currentTable0, String headerName) {
         try {
-            List<String> lines = readFile(currentTable.getStoragePath());
+            List<String> lines = readFile(currentTable0.getStoragePath());
 
             // Add the new header name to the end of the header line.
             String headerLine = lines.get(0);
             headerLine += "\t" + headerName;
             lines.set(0, headerLine);
 
-            writeFile(currentTable.getStoragePath(), lines);
+            writeFile(currentTable0.getStoragePath(), lines);
             //System.out.println("[OK]");
         } catch (IOException e) {
             e.printStackTrace();
@@ -69,9 +69,9 @@ public class TableModification {
     }
 
     // Modify or add a value to the table.
-    public static void modifyTable(Table currentTable, String indirectColumnName, String indexValue, String directColumnName, String valueToModify) {
+    public static void modifyTable(Table0 currentTable0, String indirectColumnName, String indexValue, String directColumnName, String valueToModify) {
         try {
-            List<String> lines = readFile(currentTable.getStoragePath());
+            List<String> lines = readFile(currentTable0.getStoragePath());
 
             // Analyse the table header and indirectly find the index of the column to be modified.
             int basedColumnIndex = getColumnIndex(lines.get(0), indirectColumnName); // Indirect index the value to be modified.
@@ -95,7 +95,7 @@ public class TableModification {
                 }
             }
 
-            writeFile(currentTable.getStoragePath(), lines);
+            writeFile(currentTable0.getStoragePath(), lines);
             //System.out.println("[OK]");
         } catch (IOException ioe) {
             ioe.printStackTrace();
@@ -103,9 +103,9 @@ public class TableModification {
     }
 
     // Drop a line from the table.
-    public static void dropRow(Table currentTable, String directColumnName, String indexValue) {
+    public static void dropRow(Table0 currentTable0, String directColumnName, String indexValue) {
         try {
-            List<String> lines = readFile(currentTable.getStoragePath());
+            List<String> lines = readFile(currentTable0.getStoragePath());
 
             int columnIndex = getColumnIndex(lines.get(0), directColumnName);
 
@@ -119,7 +119,7 @@ public class TableModification {
                     }
                 }
 
-                writeFile(currentTable.getStoragePath(), lines);
+                writeFile(currentTable0.getStoragePath(), lines);
                 //System.out.println("[OK]");
             } else {
                 throw new IllegalArgumentException("Column " + directColumnName + " not found.");
@@ -129,10 +129,10 @@ public class TableModification {
         }
     }
 
-    public static void dropLineWithCharacter(Table currentTable, String directColumnName, String characterToFind) {
-        String tablePath = currentTable.getStoragePath();
+    public static void dropLineWithCharacter(Table0 currentTable0, String directColumnName, String characterToFind) {
+        String tablePath = currentTable0.getStoragePath();
         try {
-            List<String> lines = readFile(currentTable.getStoragePath());
+            List<String> lines = readFile(currentTable0.getStoragePath());
             // Analyse the table header and find the index of the column.
             int columnIndex = getColumnIndex(lines.get(0), directColumnName);
             // Find the position of the indexValue.
@@ -145,7 +145,7 @@ public class TableModification {
                         i--;
                     }
                 }
-                writeFile(currentTable.getStoragePath(), lines);
+                writeFile(currentTable0.getStoragePath(), lines);
                 //System.out.println("[OK]");
             } else {
                 throw new IllegalArgumentException("Column " + directColumnName + " not found.");
@@ -156,9 +156,9 @@ public class TableModification {
     }
 
     // Drop a column form the table.
-    public static void dropColumn(Table currentTable, String headerName) {
+    public static void dropColumn(Table0 currentTable0, String headerName) {
         try {
-            List<String> lines = readFile(currentTable.getStoragePath());
+            List<String> lines = readFile(currentTable0.getStoragePath());
 
             int columnIndex = getColumnIndex(lines.get(0), headerName);
 
@@ -174,7 +174,7 @@ public class TableModification {
                     }
                 }
 
-                writeFile(currentTable.getStoragePath(), lines);
+                writeFile(currentTable0.getStoragePath(), lines);
                 //System.out.println("[OK]");
             } else {
                 System.out.println("Column " + headerName + " not found.");
