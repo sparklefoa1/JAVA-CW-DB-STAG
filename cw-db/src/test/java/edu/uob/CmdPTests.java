@@ -9,17 +9,32 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CmdPTests {
-    private CommandParser commandParser;
-    private String command;
-
-    @BeforeEach
-    public void setup() {
-        command = " CREATE     TABLE myTable ( id , INT , name ; ";
-        commandParser = new CommandParser(command);
-    }
+    private CommandParser testCommandParser;
 
     @Test
     public void testCheckSyntax() {
-        System.out.println(commandParser.checkSyntax());
+        testCommandParser = new CommandParser(" DELETE FROM marks WHERE mark < 40; ");
+        System.out.println(testCommandParser.checkSyntax());
+
+        testCommandParser = new CommandParser(" SELECT name FROM marks WHERE mark > 60; ");
+        System.out.println(testCommandParser.checkSyntax());
+
+        testCommandParser = new CommandParser(" Drop     TABLE myTable ; ");
+        System.out.println(testCommandParser.checkSyntax());
+
+        testCommandParser = new CommandParser(" JOIN coursework AND marks ON submission AND id; ");
+        System.out.println(testCommandParser.checkSyntax());
+
+        testCommandParser = new CommandParser(" ALTER     TABLE myTable DROP ages ; ");
+        System.out.println(testCommandParser.checkSyntax());
+
+        testCommandParser = new CommandParser(" INSERT INTO myTable VALUES ( 'chris', 65, 42 ); ");
+        System.out.println(testCommandParser.checkSyntax());
+
+        testCommandParser = new CommandParser(" SELECT * FROM marks WHERE name != 'Sion'; ");
+        System.out.println(testCommandParser.checkSyntax());
+
+        testCommandParser = new CommandParser(" UPDATE marks SET mark = 38 WHERE name == 'Chris'; ");
+        System.out.println(testCommandParser.checkSyntax());
     }
 }

@@ -25,7 +25,7 @@ public class CommandParser {
                 return checkUseSyntax();
             case "CREATE":
                 return checkCreateSyntax();
-            /*case "DROP":
+            case "DROP":
                 return checkDropSyntax();
             case "ALTER":
                 return checkAlterSyntax();
@@ -38,7 +38,7 @@ public class CommandParser {
             case "DELETE":
                 return checkDeleteSyntax();
             case "JOIN":
-                return checkJoinSyntax();*/
+                return checkJoinSyntax();
             default:
                 return returnedResult;
         }
@@ -54,7 +54,7 @@ public class CommandParser {
 
     private String checkCreateSyntax() {
         if (commandTokens.size() < 4) {
-            return "[ERROR]: Create syntax error";
+            return "[ERROR]: CREATE syntax error";
         }
 
         String createCommandType = commandTokens.get(1).toUpperCase();
@@ -92,8 +92,285 @@ public class CommandParser {
         return "[ERROR]: Create table syntax error";
     }
 
+    private String checkDropSyntax() {
+        if (commandTokens.size() < 4) {
+            return "[ERROR]: DROP syntax error";
+        }
+
+        String dropCommandType = commandTokens.get(1).toUpperCase();
+        switch (dropCommandType) {
+            case "DATABASE":
+                return checkDropDatabaseSyntax();
+            case "TABLE":
+                return checkDropTableSyntax();
+            default:
+                return "[ERROR]: Invalid DROP command type";
+        }
+    }
+
+    private String checkDropDatabaseSyntax() {
+        if (commandTokens.size() == 4 && isPlainText(commandTokens.get(2)) && commandTokens.get(3).equals(";")) {
+            return "[OK]";
+        } else {
+            return "[ERROR]: Drop database syntax error";
+        }
+    }
+
+    private String checkDropTableSyntax() {
+        if (commandTokens.size() == 4 && isPlainText(commandTokens.get(2)) && commandTokens.get(3).equals(";")) {
+            return "[OK]";
+        } else {
+            return "[ERROR]: Drop table syntax error";
+        }
+    }
+
+    private String checkAlterSyntax() {
+        if (commandTokens.size() != 6 || !commandTokens.get(1).equalsIgnoreCase("TABLE")) {
+            return "[ERROR]: ALTER syntax error";
+        }
+        // Checking table name
+        if (!isPlainText(commandTokens.get(2))) {
+            return "[ERROR]: Invalid table name";
+        }
+        // Checking alter command type
+        String alterCommandType = commandTokens.get(3).toUpperCase();
+        switch (alterCommandType) {
+            case "ADD":
+                return checkAlterAddSyntax();
+            case "DROP":
+                return checkAlterDropSyntax();
+            default:
+                return "[ERROR]: Invalid ALTER command type";
+        }
+    }
+
+    private String checkAlterAddSyntax() {
+        if (isPlainText(commandTokens.get(4)) && commandTokens.get(5).equals(";")) {
+            return "[OK]";
+        } else {
+            return "[ERROR]: ALTER TABLE ADD syntax error";
+        }
+    }
+
+    private String checkAlterDropSyntax() {
+        if (isPlainText(commandTokens.get(4)) && commandTokens.get(5).equals(";")) {
+            return "[OK]";
+        } else {
+            return "[ERROR]: ALTER TABLE DROP syntax error";
+        }
+    }
+
+    private String checkInsertSyntax() {
+        if (commandTokens.size() < 8 ||
+                !commandTokens.get(1).equalsIgnoreCase("INTO") ||
+                !isPlainText(commandTokens.get(2)) ||
+                !commandTokens.get(3).equalsIgnoreCase("VALUES") ||
+                !commandTokens.get(4).equals("(") ||
+                !commandTokens.get(commandTokens.size() - 2).equals(")") ||
+                !commandTokens.get(commandTokens.size() - 1).equals(";")) {
+            return "[ERROR]: INSERT syntax error";
+        }
+        // Checking value list
+        String valueList = String.join(" ", commandTokens.subList(5, commandTokens.size() - 2));
+        if (isValueListValid(valueList)) {
+            return "[OK]";
+        }
+        return "[ERROR]: Invalid value list";
+    }
+
+    // pending
+    private String checkSelectSyntax() {
+        if (commandTokens.size() < 5) {
+            return "[ERROR]: SELECT syntax error";
+        }
+
+        int fromIndex = commandTokens.indexOf("FROM");
+        if (fromIndex == -1 || fromIndex < 2 || fromIndex >= commandTokens.size() - 2) {
+            return "[ERROR]: SELECT syntax error 1";
+        }
+
+        String wildAttribList = String.join(" ", commandTokens.subList(1, fromIndex));
+        if (!isWildAttribListValid(wildAttribList)) {
+            return "[ERROR]: Invalid WildAttribList";
+        }
+
+        String tableName = commandTokens.get(fromIndex + 1);
+        if (!isPlainText(tableName)) {
+            return "[ERROR]: Invalid TableName";
+        }
+
+        int whereIndex = commandTokens.indexOf("WHERE");
+        if (whereIndex != -1) {
+            if (whereIndex != fromIndex + 2 || whereIndex >= commandTokens.size() - 4) {
+                return "[ERROR]: SELECT syntax error2";
+            }
+            String condition = String.join(" ", commandTokens.subList(whereIndex + 1, commandTokens.size() - 1));
+            if (!isConditionValid(condition)) {
+                return "[ERROR]: Invalid Condition";
+            }
+        } else if (commandTokens.size() != fromIndex + 3) {
+            return "[ERROR]: SELECT syntax error 3";
+        }
+
+        return "[OK]";
+    }
+
+    private boolean isConditionValid(String condition) {
+        String trimmedCondition = condition.trim();
+
+        // 检查最外层是否有括号包围
+        if (trimmedCondition.startsWith("(") && trimmedCondition.endsWith(")")) {
+            String innerCondition = trimmedCondition.substring(1, trimmedCondition.length() - 1).trim();
+            if (isConditionValid(innerCondition)) {
+                return true;
+            }
+        }
+
+        // 拆分布尔运算符 (AND 或 OR)
+        String[] boolOperators = {" AND ", " OR "};
+        for (String operator : boolOperators) {
+            int operatorIndex = trimmedCondition.indexOf(operator);
+            if (operatorIndex != -1) {
+                String leftCondition = trimmedCondition.substring(0, operatorIndex).trim();
+                String rightCondition = trimmedCondition.substring(operatorIndex + operator.length()).trim();
+                if (isConditionValid(leftCondition) && isConditionValid(rightCondition)) {
+                    return true;
+                }
+            }
+        }
+
+        // 检查简单条件 (attrName comparator value)
+        String[] parts = trimmedCondition.split("\\s+");
+        if (parts.length == 3) {
+            return isPlainText(parts[0]) && isComparator(parts[1]) && isValue(parts[2]);
+        }
+
+        return false;
+    }
+
+
+    private String checkUpdateSyntax() {
+        if (commandTokens.size() < 7) {
+            return "[ERROR]: UPDATE syntax error";
+        }
+
+        int setIndex = commandTokens.indexOf("SET");
+        if (setIndex == -1 || setIndex < 2 || setIndex >= commandTokens.size() - 2) {
+            return "[ERROR]: UPDATE syntax error 1";
+        }
+
+        int whereIndex = commandTokens.indexOf("WHERE");
+        if (whereIndex == -1 || whereIndex <= setIndex + 1 || whereIndex >= commandTokens.size() - 4) {
+            return "[ERROR]: UPDATE syntax error 2";
+        }
+
+        String tableName = commandTokens.get(1);
+        if (!isPlainText(tableName)) {
+            return "[ERROR]: Invalid TableName";
+        }
+
+        String nameValueList = String.join(" ", commandTokens.subList(setIndex + 1, whereIndex));
+        if (!isNameValueListValid(nameValueList)) {
+            return "[ERROR]: Invalid NameValueList";
+        }
+
+        String condition = String.join(" ", commandTokens.subList(whereIndex + 1, commandTokens.size() - 1));
+        if (!isConditionValid(condition)) {
+            return "[ERROR]: Invalid Condition";
+        }
+
+        return "[OK]";
+    }
+
+    private boolean isNameValueListValid(String nameValueList) {
+        String[] pairs = nameValueList.split(",");
+        for (String pair : pairs) {
+            if (!isNameValuePairValid(pair.trim())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isNameValuePairValid(String pair) {
+        String[] parts = pair.split("=");
+        if (parts.length != 2) {
+            return false;
+        }
+        return isPlainText(parts[0].trim()) && isValue(parts[1].trim());
+    }
+
+    private String checkDeleteSyntax() {
+        if (commandTokens.size() < 6) {
+            return "[ERROR]: DELETE syntax error";
+        }
+
+        if (!commandTokens.get(1).equalsIgnoreCase("FROM")) {
+            return "[ERROR]: DELETE syntax error 1";
+        }
+
+        String tableName = commandTokens.get(2);
+        if (!isPlainText(tableName)) {
+            return "[ERROR]: Invalid TableName";
+        }
+
+        if (!commandTokens.get(3).equalsIgnoreCase("WHERE")) {
+            return "[ERROR]: DELETE syntax error 2";
+        }
+
+        String condition = String.join(" ", commandTokens.subList(4, commandTokens.size() - 1));
+        if (!isConditionValid(condition)) {
+            return "[ERROR]: Invalid Condition";
+        }
+
+        return "[OK]";
+    }
+
+    private String checkJoinSyntax() {
+        if (commandTokens.size() != 9) {
+            return "[ERROR]: JOIN syntax error";
+        }
+
+        if (!isPlainText(commandTokens.get(1))) {
+            return "[ERROR]: Invalid first TableName";
+        }
+
+        if (!commandTokens.get(2).equalsIgnoreCase("AND")) {
+            return "[ERROR]: Expected 'AND' after first TableName";
+        }
+
+        if (!isPlainText(commandTokens.get(3))) {
+            return "[ERROR]: Invalid second TableName";
+        }
+
+        if (!commandTokens.get(4).equalsIgnoreCase("ON")) {
+            return "[ERROR]: Expected 'ON' after second TableName";
+        }
+
+        if (!isPlainText(commandTokens.get(5))) {
+            return "[ERROR]: Invalid first AttributeName";
+        }
+
+        if (!commandTokens.get(6).equalsIgnoreCase("AND")) {
+            return "[ERROR]: Expected 'AND' after first AttributeName";
+        }
+
+        if (!isPlainText(commandTokens.get(7))) {
+            return "[ERROR]: Invalid second AttributeName";
+        }
+
+        return "[OK]";
+    }
+
     private boolean isPlainText(String token) {
         return token.matches("[a-zA-Z0-9]+");
+    }
+
+    private boolean isWildAttribListValid(String wildAttribList) {
+        if (wildAttribList.equals("*")) {
+            return true;
+        }
+        return isAttributeListValid(wildAttribList);
     }
 
     private boolean isAttributeListValid(String attributeList) {
@@ -106,7 +383,49 @@ public class CommandParser {
         return true;
     }
 
-    private boolean isValue(String token) {
-        return token.matches("'[^']*'") || token.matches("TRUE|FALSE") || token.matches("[+-]?\\d+(\\.\\d+)?") || token.equals("NULL");
+    private boolean isValueListValid(String valueList) {
+        String[] values = valueList.split(",");
+        for (String value : values) {
+            if (!isValue(value.trim())) {
+                return false;
+            }
+        }
+        return true;
     }
+
+    private boolean isValue(String token) {
+        return isStringLiteral(token) || isBooleanLiteral(token) || isFloatLiteral(token) || isIntegerLiteral(token) || isNullLiteral(token);
+    }
+    private boolean isStringLiteral(String token) {
+        // BNF syntax
+        return token.matches("'([\\sA-Za-z!#\\\\$%&\\\\(\\\\)\\\\*\\\\+,\\-\\\\.\\\\/\\\\:;>=<\\\\?@\\[\\\\\\]\\\\^_`\\\\{\\\\}~0-9]*)'");
+
+    }
+
+    private boolean isBooleanLiteral(String token) {
+        return token.equalsIgnoreCase("TRUE") || token.equalsIgnoreCase("FALSE");
+    }
+
+    private boolean isFloatLiteral(String token) {
+        return token.matches("[-+]?\\d*\\.\\d+");
+    }
+
+    private boolean isIntegerLiteral(String token) {
+        return token.matches("[-+]?\\d+");
+    }
+
+    private boolean isNullLiteral(String token) {
+        return token.equalsIgnoreCase("NULL");
+    }
+
+    private boolean isBoolOperator(String token) {
+        return token.equalsIgnoreCase("AND") || token.equalsIgnoreCase("OR");
+    }
+
+    private boolean isComparator(String token) {
+        return token.equals("==") || token.equals(">") || token.equals("<") ||
+                token.equals(">=") || token.equals("<=") || token.equals("!=") ||
+                token.equalsIgnoreCase("LIKE");
+    }
+
 }
