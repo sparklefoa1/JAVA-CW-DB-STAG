@@ -4,10 +4,24 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileParser {
+public class FileManager {
 
-    // Reading in the data from the sample data file using the Java File IO API
-    public List<String[]> readDataFromFile (String filePath) throws FileNotFoundException, IOException{
+    // Finding database path
+    public static String findDatabasePath(String databaseName) throws FileNotFoundException{
+        File rootFolder = new File("databases");
+        File[] databases = rootFolder.listFiles();
+        if (databases != null) {
+            for (File database : databases) {
+                if (database.isDirectory()  && database.getName().equals(databaseName)) {
+                    return database.getAbsolutePath();
+                }
+            }
+        }
+        throw new FileNotFoundException("The database with name '" + databaseName + "' is not exist ");
+    }
+
+    // Reading in the data from file using the Java File IO API
+    public List<String[]> readDataFromFile (String filePath) throws IOException{
         List<String[]> tabFile = new ArrayList<>();
         File fileToRead = new File(filePath);
         // Trying to read data of file
@@ -25,25 +39,36 @@ public class FileParser {
         return tabFile;
     }
 
-    // Populating data to database
-    public Database populateDatabase(String filePath) throws FileNotFoundException, IOException {
+    // Populating data from file to database
+    public Database populateDatabase(String filePath) throws IOException {
         Database db = new Database("SampleDB");
         Table table = new Table("SampleTable");
 
         List<String[]> data = readDataFromFile(filePath);
 
         // 1st line is column names
+        // Checking id
         String[] columnNames = data.get(0);
-        table.addColumn(new Column("id", "int")); // The 0 column is id
+        boolean hasIdColumn = false;
+        for (String columnName : columnNames) {
+            if (columnName.equalsIgnoreCase("id")) {
+                hasIdColumn = true;
+                break;
+            }
+        }
+        if (!hasIdColumn) {
+            table.addColumn(new Column("id", "int")); // The 0 column is id if not already present
+        }
+
         for (String columnName : columnNames) {
             table.addColumn(new Column(columnName, "String")); // All data type is string
         }
 
         // Data rows begin from 2nd row
-        System.out.println(data.size());
         for (int i = 1; i < data.size(); i++) {
             String[] rowValues = data.get(i);
-            Row row = table.createNewRow(); // Generating an id when creating a new row
+            Row row = table.createNewRow();
+            // Generating an id when creating a new row
             row.addCell("id", new Cell(String.valueOf(row.getId()))); // Adding id to the 1st cell in row
             for (int j = 0; j < rowValues.length; j++) {
                 row.addCell(columnNames[j], new Cell(rowValues[j]));

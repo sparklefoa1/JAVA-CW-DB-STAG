@@ -8,20 +8,20 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FPTests {
-    private FileParser fileParser;
+public class FMTests {
+    private FileManager fileManager;
     private String filePath;
 
     @BeforeEach
     public void setup() {
-        fileParser = new FileParser();
+        fileManager = new FileManager();
     }
 
     @Test
     public void testReadDateFromFile() {
         filePath = "databases" + File.separator + "people.tab";
         try {
-            List<String[]> tabFile = fileParser.readDataFromFile(filePath);
+            List<String[]> tabFile = fileManager.readDataFromFile(filePath);
             assertNotNull(tabFile, "Records should not be null");
             assertFalse(tabFile.isEmpty(), "Records should not be empty");
         }  catch (FileNotFoundException e) {
@@ -37,7 +37,7 @@ public class FPTests {
     public void testReadDateFromFileNotFound() {
         filePath = "databases" + File.separator + "p.tab";
         assertThrows(IOException.class, () -> {
-            fileParser.readDataFromFile(filePath);
+            fileManager.readDataFromFile(filePath);
         }, "Expected to throw FileNotFoundException due to no file in the databases");
     }
 
@@ -46,7 +46,7 @@ public class FPTests {
     public void testSaveData() {
         filePath = "databases" + File.separator + "people.tab";
         try {
-            Database db = fileParser.populateDatabase(filePath);
+            Database db = fileManager.populateDatabase(filePath);
 
             // Modifying ages
             Table table = db.getTable("SampleTable");
@@ -59,7 +59,7 @@ public class FPTests {
             }
 
             // Resaving data to file
-            fileParser.saveDatabaseToFile(db, filePath);
+            fileManager.saveDatabaseToFile(db, filePath);
 
         } catch (FileNotFoundException e) {
             System.err.println("File not found: " + e.getMessage());

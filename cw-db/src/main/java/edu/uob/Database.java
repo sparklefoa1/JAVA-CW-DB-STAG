@@ -25,4 +25,7 @@ public class Database {
         return tables.values();
     }
 
+    public String getName() {
+        return name;
+    }
 }

@@ -1,5 +1,7 @@
 package edu.uob;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class CommandParser {
@@ -14,7 +16,7 @@ public class CommandParser {
         return commandTokens;
     }
 
-    public String checkSyntax() {
+    public String checkSyntax() throws IOException {
         if (commandTokens.isEmpty()) {
             return "[ERROR]: Command is empty";
         }
@@ -44,15 +46,25 @@ public class CommandParser {
         }
     }
 
-    private String checkUseSyntax() {
+    private String checkUseSyntax() throws IOException {
         if(commandTokens.size() == 3 && isPlainText(commandTokens.get(1)) && commandTokens.get(2).equals(";")) {
+            // Database name is lowercase in file system
+            String databaseName = commandTokens.get(1).toLowerCase();
+            try {
+                // Setting current database and reading all tables
+                DatabaseManager.getInstance().setCurrentDatabase(databaseName);
+            } catch (FileNotFoundException e) {
+                return "[ERROR]: Database does not exist: " + databaseName;
+            } catch (IOException e) {
+                throw e;
+            }
             return "[OK]";
         } else {
             return "[ERROR]: Use syntax error";
         }
     }
 
-    private String checkCreateSyntax() {
+    private String checkCreateSyntax() throws IOException {
         if (commandTokens.size() < 4) {
             return "[ERROR]: CREATE syntax error";
         }
@@ -70,21 +82,53 @@ public class CommandParser {
 
     private String checkCreateDatabaseSyntax() {
         if (commandTokens.size() == 4 && isPlainText(commandTokens.get(2)) && commandTokens.get(3).equals(";")) {
+            // Saving database name as lowercase
+            String databaseName = commandTokens.get(2).toLowerCase();
+            // Creating new folder to be current database
+            try {
+                DatabaseManager.getInstance().createNewDatabase(databaseName);
+            } catch (IOException e) {
+                return e.getMessage();
+            }
             return "[OK]";
         } else {
             return "[ERROR]: Create database syntax error";
         }
     }
 
-    private String checkCreateTableSyntax() {
+    private String checkCreateTableSyntax() throws IOException {
         if (commandTokens.size() >= 4 && isPlainText(commandTokens.get(2))) {
             if (commandTokens.get(3).equals(";")) {
+                // Getting current database
+                if (DatabaseManager.getInstance().getCurrentDatabase() == null) {
+                    return "[ERROR]: Database does not exist";
+                }
+                // Creating tab file as table
+                String tableName = commandTokens.get(2).toLowerCase();
+                try {
+                    DatabaseManager.getInstance().createNewTable(tableName);
+                } catch (IOException e) {
+                    return e.getMessage();
+                }
                 return "[OK]";
             } else if (commandTokens.get(3).equals("(")
                     && commandTokens.get(commandTokens.size() - 2).equals(")")
                     && commandTokens.get(commandTokens.size() - 1).equals(";")) {
                 String attributeList = String.join(" ", commandTokens.subList(4, commandTokens.size() - 2));
                 if (isAttributeListValid(attributeList)) {
+                    // Getting current database
+                    if (DatabaseManager.getInstance().getCurrentDatabase() == null) {
+                        return "[ERROR]: Database does not exist";
+                    }
+                    // Creating tab file as table
+                    String tableName = commandTokens.get(2).toLowerCase();
+                    try {
+                        DatabaseManager.getInstance().createNewTable(tableName);
+                    } catch (IOException e) {
+                        return e.getMessage();
+                    }
+                    // Insert id and attribute values == column names
+
                     return "[OK]";
                 }
             }
