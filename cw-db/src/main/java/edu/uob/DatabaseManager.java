@@ -31,10 +31,13 @@ public class DatabaseManager {
     }
 
     public void setCurrentDatabase(String databaseName) throws IOException {
+        if (isReservedKeyword(databaseName)) {
+            throw new IllegalArgumentException("[ERROR]: Database name cannot be reserved words");
+        }
         String databasePath = ROOT_DIRECTORY + File.separator + databaseName;
         File databaseFile = new File(databasePath);
         if (!databaseFile.exists() || !databaseFile.isDirectory()) {
-            throw new FileNotFoundException("The database path does not exist");
+            throw new FileNotFoundException("[ERROR]: Database does not exist");
         }
 
         if (databaseCache.containsKey(databaseName)) {
@@ -97,12 +100,6 @@ public class DatabaseManager {
                 String[] values = fileLine.split("\t");
                 tabFile.add(values);
             }
-        } catch (FileNotFoundException e) {
-            System.err.println("Table not found: " + filePath);
-            throw e;
-        } catch (IOException e) {
-            System.err.println("Error reading file: " + filePath);
-            throw e;
         }
         return tabFile;
     }
@@ -129,6 +126,10 @@ public class DatabaseManager {
     }
 
     public void createNewTable(String tableName) throws IOException {
+        if (currentDatabase == null) {
+            throw new IllegalStateException("[ERROR]: No database is currently set up");
+        }
+
         if (isReservedKeyword(tableName)) {
             throw new IllegalArgumentException("[ERROR]: Table name cannot be reserved words");
         }
@@ -185,4 +186,64 @@ public class DatabaseManager {
             table.addColumn(new Column(attribute.trim(), "String"));
         }
     }
+
+    public void deleteDatabase(String databaseName) throws IOException {
+        if (isReservedKeyword(databaseName)) {
+            throw new IllegalArgumentException("[ERROR]: Database name cannot be reserved words");
+        }
+
+        String databasePath = ROOT_DIRECTORY + File.separator + databaseName;
+        File databaseFile = new File(databasePath);
+
+        if (!databaseFile.exists() || !databaseFile.isDirectory()) {
+            throw new FileNotFoundException("[ERROR]: Database does not exist");
+        }
+
+        // Deleting the database directory and its contents
+        deleteDirectory(databaseFile);
+        // Removing a database from the cache
+        databaseCache.remove(databaseName);
+        // Setting the current database to null (if the current database is the deleted database
+        if (currentDatabase != null && currentDatabase.getName().equals(databaseName)) {
+            currentDatabase = null;
+        }
+    }
+
+    private void deleteDirectory(File directory) throws IOException {
+        if (directory.isDirectory()) {
+            File[] files = directory.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    deleteDirectory(file);
+                }
+            }
+        }
+        if (!directory.delete()) {
+            throw new IOException("Unable to delete database: " + directory.getAbsolutePath());
+        }
+    }
+
+    public void deleteTable(String tableName) throws IOException {
+        if (currentDatabase == null) {
+            throw new IllegalStateException("[ERROR]: No database is currently set up");
+        }
+
+        if (isReservedKeyword(tableName)) {
+            throw new IllegalArgumentException("[ERROR]: Table name cannot be reserved words");
+        }
+
+        String tableFilePath = ROOT_DIRECTORY + File.separator + currentDatabase.getName() + File.separator + tableName + ".tab";
+        File tableFile = new File(tableFilePath);
+
+        if (!tableFile.exists()) {
+            throw new FileNotFoundException("[ERROR]: Table does not exist");
+        }
+
+        if (!tableFile.delete()) {
+            throw new IOException("Unable to delete table file: " + tableName);
+        }
+        currentDatabase.removeTable(tableName);
+    }
+
+
 }

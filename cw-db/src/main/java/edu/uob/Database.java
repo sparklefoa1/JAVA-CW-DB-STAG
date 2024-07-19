@@ -17,6 +17,10 @@ public class Database {
         tables.put(table.getName(), table);
     }
 
+    public void removeTable(String tableName) {
+        tables.remove(tableName);
+    }
+
     public Table getTable(String name) {
         return tables.get(name);
     }

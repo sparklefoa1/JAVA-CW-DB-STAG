@@ -20,11 +20,17 @@ public class CmdPTests {
             //System.out.println(DatabaseManager.getInstance().getCurrentDatabase().getTable("people").getColumns().get(0).getName());
 
             //testCommandParser = new CommandParser(" CREATE DATABASE mydb; ");
+           //System.out.println(testCommandParser.checkSyntax());
+
+            testCommandParser = new CommandParser(" use mydb; ");
+            System.out.println(testCommandParser.checkSyntax());// 在这里设置了current database
+            //testCommandParser = new CommandParser(" CREATE TABLE markS(name, mark, pasS, int); ");
             //System.out.println(testCommandParser.checkSyntax());
 
-            testCommandParser = new CommandParser(" use testdb; ");
-            System.out.println(testCommandParser.checkSyntax());// 在这里设置了current database
-            testCommandParser = new CommandParser(" CREATE TABLE markS(name, mark, pasS, int); ");
+            //testCommandParser = new CommandParser(" drop database testdb; ");
+            //System.out.println(testCommandParser.checkSyntax());
+
+            testCommandParser = new CommandParser(" drop table marks; ");
             System.out.println(testCommandParser.checkSyntax());
 
             /*testCommandParser = new CommandParser(" DELETE FROM marks WHERE mark < 40; ");

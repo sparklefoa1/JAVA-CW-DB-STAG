@@ -53,8 +53,8 @@ public class CommandParser {
             try {
                 // Setting current database and reading all tables
                 DatabaseManager.getInstance().setCurrentDatabase(databaseName);
-            } catch (FileNotFoundException e) {
-                return "[ERROR]: Database does not exist: " + databaseName;
+            } catch (FileNotFoundException | IllegalArgumentException e) {
+                return e.getMessage();
             }
             return "[OK]";
         } else {
@@ -97,30 +97,22 @@ public class CommandParser {
     private String checkCreateTableSyntax() throws IOException {
         if (commandTokens.size() >= 4 && isPlainText(commandTokens.get(2))) {
             if (commandTokens.get(3).equals(";")) {
-                // Getting current database
-                if (DatabaseManager.getInstance().getCurrentDatabase() == null) {
-                    return "[ERROR]: Database does not exist";
-                }
                 // Creating tab file as table
                 String tableName = commandTokens.get(2).toLowerCase();
                 try {
                     DatabaseManager.getInstance().createNewTable(tableName);
-                } catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException | IllegalStateException e) {
                     return e.getMessage();
                 }
                 return "[OK]";
             } else if (commandTokens.get(3).equals("(")
                     && commandTokens.get(commandTokens.size() - 2).equals(")")
                     && commandTokens.get(commandTokens.size() - 1).equals(";")) {
-                // Getting current database
-                if (DatabaseManager.getInstance().getCurrentDatabase() == null) {
-                    return "[ERROR]: Database does not exist";
-                }
                 // Creating tab file as table
                 String tableName = commandTokens.get(2).toLowerCase();
                 try {
                     DatabaseManager.getInstance().createNewTable(tableName);
-                } catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException | IllegalStateException e) {
                     return e.getMessage();
                 }
                 // Insert id and attribute values == column names
@@ -139,7 +131,7 @@ public class CommandParser {
         return "[ERROR]: Create table syntax error";
     }
 
-    private String checkDropSyntax() {
+    private String checkDropSyntax() throws IOException {
         if (commandTokens.size() < 4) {
             return "[ERROR]: DROP syntax error";
         }
@@ -155,16 +147,28 @@ public class CommandParser {
         }
     }
 
-    private String checkDropDatabaseSyntax() {
+    private String checkDropDatabaseSyntax() throws IOException {
         if (commandTokens.size() == 4 && isPlainText(commandTokens.get(2)) && commandTokens.get(3).equals(";")) {
+            String databaseName = commandTokens.get(2).toLowerCase();
+            try {
+                DatabaseManager.getInstance().deleteDatabase(databaseName);
+            } catch (FileNotFoundException | IllegalArgumentException e) {
+                return e.getMessage();
+            }
             return "[OK]";
         } else {
             return "[ERROR]: Drop database syntax error";
         }
     }
 
-    private String checkDropTableSyntax() {
+    private String checkDropTableSyntax() throws IOException {
         if (commandTokens.size() == 4 && isPlainText(commandTokens.get(2)) && commandTokens.get(3).equals(";")) {
+            String tableName = commandTokens.get(2).toLowerCase();
+            try {
+                DatabaseManager.getInstance().deleteTable(tableName);
+            } catch (IllegalArgumentException | IllegalStateException | FileNotFoundException e) {
+                return e.getMessage();
+            }
             return "[OK]";
         } else {
             return "[ERROR]: Drop table syntax error";
