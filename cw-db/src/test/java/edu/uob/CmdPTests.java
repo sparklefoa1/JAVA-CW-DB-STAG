@@ -24,13 +24,16 @@ public class CmdPTests {
 
             testCommandParser = new CommandParser(" use mydb; ");
             System.out.println(testCommandParser.checkSyntax());// 在这里设置了current database
-            //testCommandParser = new CommandParser(" CREATE TABLE markS(name, mark, pasS, int); ");
+            //testCommandParser = new CommandParser(" CREATE TABLE markS(name, mark, pass); ");
             //System.out.println(testCommandParser.checkSyntax());
 
             //testCommandParser = new CommandParser(" drop database testdb; ");
             //System.out.println(testCommandParser.checkSyntax());
 
-            testCommandParser = new CommandParser(" drop table marks; ");
+            //testCommandParser = new CommandParser(" drop table marks; ");
+            //System.out.println(testCommandParser.checkSyntax());
+
+            testCommandParser = new CommandParser(" insert into marks values('simon', 6.5, true); ");
             System.out.println(testCommandParser.checkSyntax());
 
             /*testCommandParser = new CommandParser(" DELETE FROM marks WHERE mark < 40; ");

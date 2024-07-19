@@ -245,5 +245,83 @@ public class DatabaseManager {
         currentDatabase.removeTable(tableName);
     }
 
+    public void insertIntoTable(String tableName, String[] values) throws IOException {
+        if (currentDatabase == null) {
+            throw new IllegalStateException("[ERROR]: No database is currently set up");
+        }
+
+        Table table = currentDatabase.getTable(tableName);
+        if (table == null) {
+            throw new FileNotFoundException("[ERROR]: Table does not exist");
+        }
+
+        // Getting the number of columns in the table
+        int columnCount = table.getColumns().size();
+
+        // Checking if the number of inserted values matches
+        if (values.length != columnCount - 1) { // Except id column
+            throw new IllegalArgumentException("[ERROR]: Too many or too few values inserted");
+        }
+
+        // Removing spaces between values
+        for (int i = 0; i < values.length; i++) {
+            values[i] = values[i].trim();
+        }
+
+        // Adding 1 to new id
+        int newId = table.getRows().size() + 1;
+        List<String> rowValues = new ArrayList<>();
+        rowValues.add(String.valueOf(newId));
+
+        // Converting the values and updating the data type of the column
+        List<Column> columns = table.getColumns();
+        for (int i = 0; i < values.length; i++) {
+            String value = values[i].trim();
+            String dataType = "String"; // The default data type is String
+
+            if (value.startsWith("'") && value.endsWith("'")) {
+                // Removing ''
+                value = value.substring(1, value.length() - 1);
+                dataType = "String";
+            } else if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+                value = value.toUpperCase();
+                dataType = "Boolean";
+            } else if (value.equalsIgnoreCase("NULL")) {
+                value = "NULL";
+                dataType = "NULL";
+            } else {
+                try {
+                    if (value.contains(".")) {
+                        Float.parseFloat(value);
+                        dataType = "Float";
+                    } else {
+                        Integer.parseInt(value);
+                        dataType = "Integer";
+                    }
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("Unable to convert value:" + value);
+                }
+            }
+            rowValues.add(value);
+            columns.get(i + 1).setDataType(dataType);
+        }
+
+        // Writing into the table file
+        String tableFilePath = ROOT_DIRECTORY + File.separator + currentDatabase.getName() + File.separator + tableName + ".tab";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(tableFilePath, true))) {
+            writer.write(String.join("\t", rowValues));
+            writer.newLine();
+        }
+
+        // Updating table data in memory
+        Row row = table.createNewRow();
+        row.addCell("id", new Cell(String.valueOf(newId)));
+        for (int i = 0; i < values.length; i++) {
+            String columnName = columns.get(i + 1).getName();
+            String value = rowValues.get(i + 1);
+            row.addCell(columnName, new Cell(value));
+        }
+        table.addRow(row);
+    }
 
 }

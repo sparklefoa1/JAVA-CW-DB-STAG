@@ -16,4 +16,8 @@ public class Column {
     public String getDataType() {
         return dataType;
     }
+
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
+    }
 }

@@ -211,7 +211,7 @@ public class CommandParser {
         }
     }
 
-    private String checkInsertSyntax() {
+    private String checkInsertSyntax() throws IOException {
         if (commandTokens.size() < 8 ||
                 !commandTokens.get(1).equalsIgnoreCase("INTO") ||
                 !isPlainText(commandTokens.get(2)) ||
@@ -224,6 +224,14 @@ public class CommandParser {
         // Checking value list
         String valueList = String.join(" ", commandTokens.subList(5, commandTokens.size() - 2));
         if (isValueListValid(valueList)) {
+            // Writing values into attributes
+            String tableName = commandTokens.get(2);
+            String[] values = valueList.split(",");
+            try {
+                DatabaseManager.getInstance().insertIntoTable(tableName, values);
+            } catch (IllegalStateException | FileNotFoundException | IllegalArgumentException e) {
+                return e.getMessage();
+            }
             return "[OK]";
         }
         return "[ERROR]: Invalid value list";
@@ -449,7 +457,7 @@ public class CommandParser {
     }
     private boolean isStringLiteral(String token) {
         // BNF syntax
-        return token.matches("'([\\sA-Za-z!#\\\\$%&\\\\(\\\\)\\\\*\\\\+,\\-\\\\.\\\\/\\\\:;>=<\\\\?@\\[\\\\\\]\\\\^_`\\\\{\\\\}~0-9]*)'");
+        return token.matches("'([\\sA-Za-z!#\\\\$%&()*+,\\-./:;>=<?@\\[\\]^_`{}~0-9]*)'");
 
     }
 
