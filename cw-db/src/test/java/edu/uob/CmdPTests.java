@@ -22,9 +22,9 @@ public class CmdPTests {
             //testCommandParser = new CommandParser(" CREATE DATABASE mydb; ");
             //System.out.println(testCommandParser.checkSyntax());
 
-            testCommandParser = new CommandParser(" USE testdb; ");
+            testCommandParser = new CommandParser(" use testdb; ");
             System.out.println(testCommandParser.checkSyntax());// 在这里设置了current database
-            testCommandParser = new CommandParser(" CREATE TABLE myTable; ");
+            testCommandParser = new CommandParser(" CREATE TABLE markS(name, mark, pasS, int); ");
             System.out.println(testCommandParser.checkSyntax());
 
             /*testCommandParser = new CommandParser(" DELETE FROM marks WHERE mark < 40; ");

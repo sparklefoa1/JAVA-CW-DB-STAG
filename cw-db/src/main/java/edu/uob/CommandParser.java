@@ -55,8 +55,6 @@ public class CommandParser {
                 DatabaseManager.getInstance().setCurrentDatabase(databaseName);
             } catch (FileNotFoundException e) {
                 return "[ERROR]: Database does not exist: " + databaseName;
-            } catch (IOException e) {
-                throw e;
             }
             return "[OK]";
         } else {
@@ -80,14 +78,14 @@ public class CommandParser {
         }
     }
 
-    private String checkCreateDatabaseSyntax() {
+    private String checkCreateDatabaseSyntax() throws IOException {
         if (commandTokens.size() == 4 && isPlainText(commandTokens.get(2)) && commandTokens.get(3).equals(";")) {
             // Saving database name as lowercase
             String databaseName = commandTokens.get(2).toLowerCase();
             // Creating new folder to be current database
             try {
                 DatabaseManager.getInstance().createNewDatabase(databaseName);
-            } catch (IOException e) {
+            } catch (IllegalArgumentException e) {
                 return e.getMessage();
             }
             return "[OK]";
@@ -107,28 +105,33 @@ public class CommandParser {
                 String tableName = commandTokens.get(2).toLowerCase();
                 try {
                     DatabaseManager.getInstance().createNewTable(tableName);
-                } catch (IOException e) {
+                } catch (IllegalArgumentException e) {
                     return e.getMessage();
                 }
                 return "[OK]";
             } else if (commandTokens.get(3).equals("(")
                     && commandTokens.get(commandTokens.size() - 2).equals(")")
                     && commandTokens.get(commandTokens.size() - 1).equals(";")) {
+                // Getting current database
+                if (DatabaseManager.getInstance().getCurrentDatabase() == null) {
+                    return "[ERROR]: Database does not exist";
+                }
+                // Creating tab file as table
+                String tableName = commandTokens.get(2).toLowerCase();
+                try {
+                    DatabaseManager.getInstance().createNewTable(tableName);
+                } catch (IllegalArgumentException e) {
+                    return e.getMessage();
+                }
+                // Insert id and attribute values == column names
                 String attributeList = String.join(" ", commandTokens.subList(4, commandTokens.size() - 2));
                 if (isAttributeListValid(attributeList)) {
-                    // Getting current database
-                    if (DatabaseManager.getInstance().getCurrentDatabase() == null) {
-                        return "[ERROR]: Database does not exist";
-                    }
-                    // Creating tab file as table
-                    String tableName = commandTokens.get(2).toLowerCase();
+                    String[] attributes = attributeList.split(",");
                     try {
-                        DatabaseManager.getInstance().createNewTable(tableName);
-                    } catch (IOException e) {
+                        DatabaseManager.getInstance().addAttributesToTable(tableName, attributes);
+                    } catch (IllegalArgumentException e) {
                         return e.getMessage();
                     }
-                    // Insert id and attribute values == column names
-
                     return "[OK]";
                 }
             }

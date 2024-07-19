@@ -1,10 +1,7 @@
 package edu.uob;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DatabaseManager {
     // Making sure that only one DatabaseManager instance manages the current database
@@ -12,6 +9,15 @@ public class DatabaseManager {
     private Database currentDatabase;
     private Map<String, Database> databaseCache;
     private static final String ROOT_DIRECTORY = "databases";
+    private static final Set<String> RESERVED_KEYWORDS = new HashSet<>(Arrays.asList(
+            "USE", "CREATE", "DROP", "ALTER", "INSERT", "SELECT", "UPDATE", "DELETE", "JOIN",
+            "DATABASE", "TABLE", "INTO", "VALUES", "FROM", "WHERE", "SET",
+            "AND", "ON", "ADD", "TRUE", "FALSE", "NULL", "OR", "LIKE"
+    ));
+
+    public static boolean isReservedKeyword(String name) {
+        return RESERVED_KEYWORDS.contains(name.toUpperCase());
+    }
 
     private DatabaseManager() {
         databaseCache = new HashMap<>();
@@ -102,11 +108,15 @@ public class DatabaseManager {
     }
 
     public void createNewDatabase(String databaseName) throws IOException {
+        if (isReservedKeyword(databaseName)) {
+            throw new IllegalArgumentException("[ERROR]: Database name cannot be reserved words");
+        }
+
         String databasePath = ROOT_DIRECTORY + File.separator + databaseName;
         File databaseFile = new File(databasePath);
 
         if (databaseFile.exists()) {
-            throw new IOException("[ERROR]: Database already exists");
+            throw new IllegalArgumentException("[ERROR]: Database already exists");
         }
 
         if (databaseFile.mkdir()) {
@@ -119,11 +129,15 @@ public class DatabaseManager {
     }
 
     public void createNewTable(String tableName) throws IOException {
+        if (isReservedKeyword(tableName)) {
+            throw new IllegalArgumentException("[ERROR]: Table name cannot be reserved words");
+        }
+
         String tableFilePath = ROOT_DIRECTORY + File.separator + currentDatabase.getName() + File.separator + tableName + ".tab";
         File tableFile = new File(tableFilePath);
 
         if (tableFile.exists()) {
-            throw new IOException("[ERROR]: Table already exists");
+            throw new IllegalArgumentException("[ERROR]: Table already exists");
         }
 
         if (tableFile.createNewFile()) {
@@ -131,6 +145,44 @@ public class DatabaseManager {
             currentDatabase.addTable(table);
         } else {
             throw new IOException("Unable to create table file: " + tableName);
+        }
+    }
+
+    public void addAttributesToTable(String tableName, String[] attributes) throws IOException {
+        String tableFilePath = ROOT_DIRECTORY + File.separator + currentDatabase.getName() + File.separator + tableName + ".tab";
+        File tableFile = new File(tableFilePath);
+
+        // Setting column names and add id column
+        List<String> columns = new ArrayList<>();
+        columns.add("id");
+        // Avoiding duplicate column names
+        Set<String> columnNames = new HashSet<>();
+        columnNames.add("id");
+        for (String attribute : attributes) {
+            attribute= attribute.trim();
+            if (attribute.equalsIgnoreCase("id")) {
+                throw new IllegalArgumentException("[ERROR]: Manually updating the 'id' column is not allowed");
+            }
+            if (isReservedKeyword(attribute)) {
+                throw new IllegalArgumentException("[ERROR]: Attribute cannot be reserved words");
+            }
+            if (!columnNames.add(attribute)) {
+                throw new IllegalArgumentException("[ERROR]: duplicate column name " + attribute);
+            }
+            columns.add(attribute);
+        }
+
+        // Writing column names to file
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(tableFile))) {
+            writer.write(String.join("\t", columns));
+            writer.newLine();
+        }
+
+        // Updating the table in memory
+        Table table = currentDatabase.getTable(tableName);
+        table.addColumn(new Column("id", "int"));
+        for (String attribute : attributes) {
+            table.addColumn(new Column(attribute.trim(), "String"));
         }
     }
 }
