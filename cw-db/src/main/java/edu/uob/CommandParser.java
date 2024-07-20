@@ -238,14 +238,20 @@ public class CommandParser {
     }
 
     // pending
-    private String checkSelectSyntax() {
-        if (commandTokens.size() < 5) {
+    private String checkSelectSyntax() throws IOException {
+        if (commandTokens.size() < 5 || !commandTokens.get(commandTokens.size() - 1).equals(";")) {
             return "[ERROR]: SELECT syntax error";
         }
 
-        int fromIndex = commandTokens.indexOf("FROM");
-        if (fromIndex == -1 || fromIndex < 2 || fromIndex >= commandTokens.size() - 2) {
-            return "[ERROR]: SELECT syntax error 1";
+        int fromIndex = -1;
+        for (int i = 0; i < commandTokens.size(); i++) {
+            if (commandTokens.get(i).equalsIgnoreCase("FROM")) {
+                fromIndex = i;
+                break;
+            }
+        }
+        if (fromIndex < 2 || fromIndex >= commandTokens.size() - 2) {
+            return "[ERROR]: SELECT syntax error: FROM";
         }
 
         String wildAttribList = String.join(" ", commandTokens.subList(1, fromIndex));
@@ -261,15 +267,23 @@ public class CommandParser {
         int whereIndex = commandTokens.indexOf("WHERE");
         if (whereIndex != -1) {
             if (whereIndex != fromIndex + 2 || whereIndex >= commandTokens.size() - 4) {
-                return "[ERROR]: SELECT syntax error2";
+                return "[ERROR]: SELECT syntax error: missing WHERE";
             }
             String condition = String.join(" ", commandTokens.subList(whereIndex + 1, commandTokens.size() - 1));
             if (!isConditionValid(condition)) {
                 return "[ERROR]: Invalid Condition";
             }
         } else if (commandTokens.size() != fromIndex + 3) {
-            return "[ERROR]: SELECT syntax error 3";
+            return "[ERROR]: SELECT syntax error";
+        } else {
+            // There are no conditions
+            try {
+                return "[OK]" + "\n" + DatabaseManager.getInstance().selectColumnsFromTable(tableName, wildAttribList);
+            } catch (IllegalStateException | IllegalArgumentException | FileNotFoundException e) {
+                return e.getMessage();
+            }
         }
+        // There are conditions
 
         return "[OK]";
     }
@@ -277,7 +291,7 @@ public class CommandParser {
     private boolean isConditionValid(String condition) {
         String trimmedCondition = condition.trim();
 
-        // 检查最外层是否有括号包围
+        // Check ()
         if (trimmedCondition.startsWith("(") && trimmedCondition.endsWith(")")) {
             String innerCondition = trimmedCondition.substring(1, trimmedCondition.length() - 1).trim();
             if (isConditionValid(innerCondition)) {
@@ -285,7 +299,7 @@ public class CommandParser {
             }
         }
 
-        // 拆分布尔运算符 (AND 或 OR)
+        // Check AND or OR
         String[] boolOperators = {" AND ", " OR "};
         for (String operator : boolOperators) {
             int operatorIndex = trimmedCondition.indexOf(operator);
@@ -298,7 +312,7 @@ public class CommandParser {
             }
         }
 
-        // 检查简单条件 (attrName comparator value)
+        // Check conditions: attrName comparator value
         String[] parts = trimmedCondition.split("\\s+");
         if (parts.length == 3) {
             return isPlainText(parts[0]) && isComparator(parts[1]) && isValue(parts[2]);
@@ -475,10 +489,6 @@ public class CommandParser {
 
     private boolean isNullLiteral(String token) {
         return token.equalsIgnoreCase("NULL");
-    }
-
-    private boolean isBoolOperator(String token) {
-        return token.equalsIgnoreCase("AND") || token.equalsIgnoreCase("OR");
     }
 
     private boolean isComparator(String token) {

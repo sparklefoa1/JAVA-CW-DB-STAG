@@ -69,9 +69,9 @@ public class FileManager {
             String[] rowValues = data.get(i);
             Row row = table.createNewRow();
             // Generating an id when creating a new row
-            row.addCell("id", new Cell(String.valueOf(row.getId()))); // Adding id to the 1st cell in row
+            row.addCell("id", new Cell("id", String.valueOf(row.getId()))); // Adding id to the 1st cell in row
             for (int j = 0; j < rowValues.length; j++) {
-                row.addCell(columnNames[j], new Cell(rowValues[j]));
+                row.addCell(columnNames[j], new Cell(columnNames[j], rowValues[j]));
             }
             table.addRow(row);
         }

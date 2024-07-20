@@ -76,7 +76,7 @@ public class DatabaseManager {
                         String[] rowValues = tableData.get(i);
                         Row row = table.createNewRow();
                         for (int j = 0; j < rowValues.length; j++) {
-                            row.addCell(columnNames[j], new Cell(rowValues[j]));
+                            row.addCell(columnNames[j], new Cell(columnNames[j], rowValues[j]));
                         }
                         table.addRow(row);
                     }
@@ -315,13 +315,112 @@ public class DatabaseManager {
 
         // Updating table data in memory
         Row row = table.createNewRow();
-        row.addCell("id", new Cell(String.valueOf(newId)));
+        row.addCell("id", new Cell("id", String.valueOf(newId)));
         for (int i = 0; i < values.length; i++) {
             String columnName = columns.get(i + 1).getName();
             String value = rowValues.get(i + 1);
-            row.addCell(columnName, new Cell(value));
+            row.addCell(columnName, new Cell(columnName, value));
         }
         table.addRow(row);
+    }
+
+    public String selectAllFromTable(String tableName) throws IOException {
+        if (currentDatabase == null) {
+            throw new IllegalStateException("[ERROR]: No database is currently set up");
+        }
+
+        if (isReservedKeyword(tableName)) {
+            throw new IllegalArgumentException("[ERROR]: Table name cannot be reserved words");
+        }
+
+        Table table = currentDatabase.getTable(tableName);
+        if (table == null) {
+            throw new FileNotFoundException("[ERROR]: Table does not exist");
+        }
+
+        StringBuilder result = new StringBuilder();
+        List<Column> columns = table.getColumns();
+        List<Row> rows = table.getRows();
+
+        // Ready out columns names
+        for (Column column : columns) {
+            result.append(column.getName()).append("\t");
+        }
+        result.setLength(result.length() - 1); // Removing last tab
+        result.append("\n");
+
+        // Ready out rows data
+        for (Row row : rows) {
+            for (Cell cell : row.getCells()) {
+                result.append(cell.getValue()).append("\t");
+            }
+            result.setLength(result.length() - 1); // Removing last tab
+            result.append("\n");
+        }
+
+        return result.toString();
+    }
+
+    public String selectColumnsFromTable(String tableName, String wildAttribList) throws IOException {
+        if (currentDatabase == null) {
+            throw new IllegalStateException("[ERROR]: No database is currently set up");
+        }
+
+        if (isReservedKeyword(tableName)) {
+            throw new IllegalArgumentException("[ERROR]: Table name cannot be reserved words");
+        }
+
+        Table table = currentDatabase.getTable(tableName);
+        if (table == null) {
+            throw new FileNotFoundException("[ERROR]: Table does not exist");
+        }
+
+        StringBuilder result = new StringBuilder();
+        List<Column> columns = table.getColumns();
+        List<Row> rows = table.getRows();
+
+        List<String> selectedColumns = new ArrayList<>();
+        if ("*".equals(wildAttribList.trim())) {
+            // Getting columns names
+            for (Column column : columns) {
+                selectedColumns.add(column.getName());
+            }
+        } else {
+            // Getting attributes
+            String[] attribArray = wildAttribList.split(",");
+            for (String attrib : attribArray) {
+                selectedColumns.add(attrib.trim());
+            }
+        }
+
+        // Ready out columns names
+        for (String columnName : selectedColumns) {
+            result.append(columnName).append("\t");
+        }
+        result.setLength(result.length() - 1); // Removing last tab
+        result.append("\n");
+
+        // Ready out rows data
+        for (Row row : rows) {
+            Map<String, Cell> cellMap = new HashMap<>();
+
+            for (Cell cell : row.getCells()) {
+                cellMap.put(cell.getColumnName(), cell);
+            }
+
+            for (String columnName : selectedColumns) {
+                Cell cell = cellMap.get(columnName);
+                if (cell != null) {
+                    result.append(cell.getValue()).append("\t");
+                } else {
+                    result.append("\t");
+                }
+            }
+            result.setLength(result.length() - 1); // Removing last tab
+            result.append("\n");
+        }
+
+        return result.toString();
     }
 
 }
