@@ -36,7 +36,10 @@ public class CmdPTests {
             //testCommandParser = new CommandParser(" insert into marks values('chris', 20, false); ");
             //System.out.println(testCommandParser.checkSyntax());
 
-            testCommandParser = new CommandParser(" select pass, id from marks; ");
+            //testCommandParser = new CommandParser(" select pass, id from marks; ");
+            //System.out.println(testCommandParser.checkSyntax());
+
+            testCommandParser = new CommandParser(" select * from marks where pass == false and name > i; ");
             System.out.println(testCommandParser.checkSyntax());
 
             /*testCommandParser = new CommandParser(" DELETE FROM marks WHERE mark < 40; ");

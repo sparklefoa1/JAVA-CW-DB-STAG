@@ -264,28 +264,38 @@ public class CommandParser {
             return "[ERROR]: Invalid TableName";
         }
 
-        int whereIndex = commandTokens.indexOf("WHERE");
+        int whereIndex = -1;
+        for (int i = 0; i < commandTokens.size(); i++) {
+            if (commandTokens.get(i).equalsIgnoreCase("WHERE")) {
+                whereIndex = i;
+                break;
+            }
+        }
         if (whereIndex != -1) {
             if (whereIndex != fromIndex + 2 || whereIndex >= commandTokens.size() - 4) {
-                return "[ERROR]: SELECT syntax error: missing WHERE";
+                return "[ERROR]: SELECT syntax error: WHERE";
             }
             String condition = String.join(" ", commandTokens.subList(whereIndex + 1, commandTokens.size() - 1));
             if (!isConditionValid(condition)) {
                 return "[ERROR]: Invalid Condition";
+            } else {
+                // There are conditions
+                try {
+                    return "[OK]" + "\n" + DatabaseManager.getInstance().selectColumnsFromTable(tableName, wildAttribList, condition);
+                } catch (IllegalStateException | IllegalArgumentException | FileNotFoundException e) {
+                    return e.getMessage();
+                }
             }
         } else if (commandTokens.size() != fromIndex + 3) {
             return "[ERROR]: SELECT syntax error";
         } else {
             // There are no conditions
             try {
-                return "[OK]" + "\n" + DatabaseManager.getInstance().selectColumnsFromTable(tableName, wildAttribList);
+                return "[OK]" + "\n" + DatabaseManager.getInstance().selectColumnsFromTable(tableName, wildAttribList, null);
             } catch (IllegalStateException | IllegalArgumentException | FileNotFoundException e) {
                 return e.getMessage();
             }
         }
-        // There are conditions
-
-        return "[OK]";
     }
 
     private boolean isConditionValid(String condition) {
@@ -301,26 +311,49 @@ public class CommandParser {
 
         // Check AND or OR
         String[] boolOperators = {" AND ", " OR "};
+        String upperCaseCondition = trimmedCondition.toUpperCase();
         for (String operator : boolOperators) {
-            int operatorIndex = trimmedCondition.indexOf(operator);
+            int operatorIndex = upperCaseCondition.indexOf(operator);
+            //System.out.println(operatorIndex);
             if (operatorIndex != -1) {
                 String leftCondition = trimmedCondition.substring(0, operatorIndex).trim();
                 String rightCondition = trimmedCondition.substring(operatorIndex + operator.length()).trim();
                 if (isConditionValid(leftCondition) && isConditionValid(rightCondition)) {
-                    return true;
+                    if (operator.trim().equalsIgnoreCase("AND")) {
+                        return checkConditions(leftCondition) && checkConditions(rightCondition);
+                    } else if (operator.trim().equalsIgnoreCase("OR")) {
+                        return checkConditions(leftCondition) || checkConditions(rightCondition);
+                    }
                 }
             }
         }
 
-        // Check conditions: attrName comparator value
-        String[] parts = trimmedCondition.split("\\s+");
-        if (parts.length == 3) {
-            return isPlainText(parts[0]) && isComparator(parts[1]) && isValue(parts[2]);
+        // Check simple conditions: attrName, comparator, value
+        return checkConditions(trimmedCondition);
+    }
+
+    private boolean checkConditions(String condition) {
+        String[] parts = condition.split("\\s+");
+        if (parts.length >= 3) {
+            String attributeName = parts[0];
+            String comparator = parts[1];
+            String value = parts[2];
+
+            // Remove single quotes for string literals
+            if (value.startsWith("'") && value.endsWith("'")) {
+                value = value.substring(1, value.length() - 1);
+            }
+
+            // Convert boolean literals to uppercase
+            if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+                value = value.toUpperCase();
+            }
+
+            return isPlainText(attributeName) && isComparator(comparator) && isValue(value);
         }
 
         return false;
     }
-
 
     private String checkUpdateSyntax() {
         if (commandTokens.size() < 7) {

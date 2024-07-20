@@ -361,7 +361,7 @@ public class DatabaseManager {
         return result.toString();
     }
 
-    public String selectColumnsFromTable(String tableName, String wildAttribList) throws IOException {
+    public String selectColumnsFromTable(String tableName, String wildAttribList, String condition) throws IOException {
         if (currentDatabase == null) {
             throw new IllegalStateException("[ERROR]: No database is currently set up");
         }
@@ -400,27 +400,119 @@ public class DatabaseManager {
         result.setLength(result.length() - 1); // Removing last tab
         result.append("\n");
 
+        boolean hasMatchingRow = false;
+
         // Ready out rows data
         for (Row row : rows) {
-            Map<String, Cell> cellMap = new HashMap<>();
+            if (condition == null || evaluateCondition(row, columns, condition)) {
+                hasMatchingRow = true;
+                Map<String, Cell> cellMap = new HashMap<>();
 
-            for (Cell cell : row.getCells()) {
-                cellMap.put(cell.getColumnName(), cell);
-            }
-
-            for (String columnName : selectedColumns) {
-                Cell cell = cellMap.get(columnName);
-                if (cell != null) {
-                    result.append(cell.getValue()).append("\t");
-                } else {
-                    result.append("\t");
+                for (Cell cell : row.getCells()) {
+                    cellMap.put(cell.getColumnName(), cell);
                 }
+
+                for (String columnName : selectedColumns) {
+                    Cell cell = cellMap.get(columnName);
+                    if (cell != null) {
+                        result.append(cell.getValue()).append("\t");
+                    } else {
+                        result.append("\t");
+                    }
+                }
+                result.setLength(result.length() - 1); // Removing last tab
+                result.append("\n");
             }
-            result.setLength(result.length() - 1); // Removing last tab
-            result.append("\n");
+        }
+
+        if (!hasMatchingRow) {
+            // No matching rows, only return column names
+            return result.toString();
         }
 
         return result.toString();
     }
 
+    // Evaluate the condition on a row
+    private boolean evaluateCondition(Row row, List<Column> columns, String condition) {
+        String trimmedCondition = condition.trim();
+
+        // Check ()
+        if (trimmedCondition.startsWith("(") && trimmedCondition.endsWith(")")) {
+            String innerCondition = trimmedCondition.substring(1, trimmedCondition.length() - 1).trim();
+            return evaluateCondition(row, columns, innerCondition);
+        }
+
+        // Check AND or OR
+        String[] boolOperators = {" AND ", " OR "};
+        String upperCaseCondition = trimmedCondition.toUpperCase();
+        for (String operator : boolOperators) {
+            int operatorIndex = upperCaseCondition.indexOf(operator);
+            if (operatorIndex != -1) {
+                String leftCondition = trimmedCondition.substring(0, operatorIndex).trim();
+                String rightCondition = trimmedCondition.substring(operatorIndex + operator.length()).trim();
+                if (operator.trim().equalsIgnoreCase("AND")) {
+                    return evaluateCondition(row, columns, leftCondition) && evaluateCondition(row, columns, rightCondition);
+                } else if (operator.trim().equalsIgnoreCase("OR")) {
+                    return evaluateCondition(row, columns, leftCondition) || evaluateCondition(row, columns, rightCondition);
+                }
+            }
+        }
+
+        // Check simple condition: attrName, comparator, value
+        String[] parts = trimmedCondition.split("\\s+");
+        if (parts.length == 3) {
+            String attributeName = parts[0];
+            String comparator = parts[1];
+            String value = parts[2];
+
+            // Remove single quotes for string literals
+            if (value.startsWith("'") && value.endsWith("'")) {
+                value = value.substring(1, value.length() - 1);
+            }
+
+            // Convert boolean literals to uppercase
+            if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+                value = value.toUpperCase();
+            }
+
+            for (Column column : columns) {
+                if (column.getName().equals(attributeName)) {
+                    Cell cell = row.getCells().stream()
+                            .filter(c -> c.getColumnName().equals(attributeName))
+                            .findFirst()
+                            .orElse(null);
+                    if (cell == null) {
+                        return false;
+                    }
+                    String cellValue = cell.getValue();
+                    try {
+                        switch (comparator.toUpperCase()) {
+                            case "==":
+                                return cellValue.equals(value);
+                            case "!=":
+                                return !cellValue.equals(value);
+                            case "<":
+                                return Double.parseDouble(cellValue) < Double.parseDouble(value);
+                            case ">":
+                                return Double.parseDouble(cellValue) > Double.parseDouble(value);
+                            case "<=":
+                                return Double.parseDouble(cellValue) <= Double.parseDouble(value);
+                            case ">=":
+                                return Double.parseDouble(cellValue) >= Double.parseDouble(value);
+                            case "LIKE":
+                                return cellValue.contains(value);
+                            default:
+                                throw new IllegalArgumentException("Invalid comparator: " + comparator);
+                        }
+                    } catch (NumberFormatException e) {
+                        // If comparison fails due to type mismatch, return false
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
 }
