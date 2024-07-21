@@ -24,7 +24,7 @@ public class CmdPTests {
 
             testCommandParser = new CommandParser(" use mydb; ");
             System.out.println(testCommandParser.checkSyntax());// 在这里设置了current database
-            //testCommandParser = new CommandParser(" CREATE TABLE markS(name, mark, pass); ");
+            //testCommandParser = new CommandParser(" CREATE TABLE markS(name, mark, pass, name); ");
             //System.out.println(testCommandParser.checkSyntax());
 
             //testCommandParser = new CommandParser(" drop database testdb; ");
@@ -49,7 +49,10 @@ public class CmdPTests {
             //testCommandParser = new CommandParser(" select name, id from marks where pass == false and id > 3; ");
             //System.out.println(testCommandParser.checkSyntax());
 
-            testCommandParser = new CommandParser(" UPDATE marks SET mark = 38 WHERE name == 'Chris' ; ");
+            //testCommandParser = new CommandParser(" UPDATE marks SET mark = 38 WHERE name == 'Chris' ; ");
+            //System.out.println(testCommandParser.checkSyntax());
+
+            testCommandParser = new CommandParser(" ALTER     TABLE marks drop Id ; ");
             System.out.println(testCommandParser.checkSyntax());
 
             /*testCommandParser = new CommandParser(" DELETE FROM marks WHERE mark < 40; ");
@@ -62,9 +65,6 @@ public class CmdPTests {
             System.out.println(testCommandParser.checkSyntax());
 
             testCommandParser = new CommandParser(" JOIN coursework AND marks ON submission AND id; ");
-            System.out.println(testCommandParser.checkSyntax());
-
-            testCommandParser = new CommandParser(" ALTER     TABLE myTable DROP ages ; ");
             System.out.println(testCommandParser.checkSyntax());
 
             testCommandParser = new CommandParser(" INSERT INTO myTable VALUES ( 'chris', 65, 42 ); ");

@@ -176,7 +176,7 @@ public class CommandParser {
         }
     }
 
-    private String checkAlterSyntax() {
+    private String checkAlterSyntax() throws IOException {
         if (commandTokens.size() != 6 || !commandTokens.get(1).equalsIgnoreCase("TABLE")) {
             return "[ERROR]: ALTER syntax error";
         }
@@ -196,17 +196,27 @@ public class CommandParser {
         }
     }
 
-    private String checkAlterAddSyntax() {
+    private String checkAlterAddSyntax() throws IOException {
         if (isPlainText(commandTokens.get(4)) && commandTokens.get(5).equals(";")) {
-            return "[OK]";
+            String tableName = commandTokens.get(2);
+            String alterCommandType = commandTokens.get(3).toUpperCase();
+            String attributeName = commandTokens.get(4);
+
+            String alterResult = DatabaseManager.getInstance().alterTable(tableName, alterCommandType, attributeName);
+            return alterResult;
         } else {
             return "[ERROR]: ALTER TABLE ADD syntax error";
         }
     }
 
-    private String checkAlterDropSyntax() {
+    private String checkAlterDropSyntax() throws IOException {
         if (isPlainText(commandTokens.get(4)) && commandTokens.get(5).equals(";")) {
-            return "[OK]";
+            String tableName = commandTokens.get(2);
+            String alterCommandType = commandTokens.get(3).toUpperCase();
+            String attributeName = commandTokens.get(4);
+
+            String alterResult = DatabaseManager.getInstance().alterTable(tableName, alterCommandType, attributeName);
+            return alterResult;
         } else {
             return "[ERROR]: ALTER TABLE DROP syntax error";
         }
@@ -385,7 +395,6 @@ public class CommandParser {
         if (!isConditionValid(condition)) {
             return "[ERROR]: Invalid Condition";
         }
-
 
         String updateResult = DatabaseManager.getInstance().updateTable(tableName, nameValueList, condition);
         return updateResult;

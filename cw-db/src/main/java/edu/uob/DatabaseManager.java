@@ -564,7 +564,6 @@ public class DatabaseManager {
             saveTable(table, tableName);
             return "[OK]";
         } else {
-            //return "test";
             throw new IOException("No rows matched the condition");
         }
     }
@@ -598,6 +597,80 @@ public class DatabaseManager {
             updates.put(attributeName, value);
         }
         return updates;
+    }
+
+    public String alterTable(String tableName, String alterationType, String attributeName) throws IOException {
+        if (currentDatabase == null) {
+            return "[ERROR]: No database is currently set up";
+        }
+
+        if (isReservedKeyword(tableName)) {
+            return "[ERROR]: Table name cannot be reserved words";
+        }
+
+        Table table = currentDatabase.getTable(tableName);
+        if (table == null) {
+            return "[ERROR]: Table does not exist";
+        }
+
+        // Cannot alter ID column
+        if (attributeName.equalsIgnoreCase("id")) {
+            return "[ERROR]: Cannot alter ID column";
+        }
+
+        if (alterationType.equals("ADD")) {
+            return addColumn(table, attributeName);
+        } else if (alterationType.equals("DROP")) {
+            return dropColumn(table, attributeName);
+        } else {
+            return "[ERROR]: Invalid alteration type: " + alterationType;
+        }
+    }
+
+    private String addColumn(Table table, String columnName) throws IOException {
+        // Checking column exist
+        for (Column column : table.getColumns()) {
+            if (column.getName().equals(columnName)) { // sensitive case
+                return "[ERROR]: Column already exists: " + columnName;
+            }
+        }
+
+        // Add new column (name
+        table.addColumn(new Column(columnName, "String")); // Assuming data type is string
+
+        // Update all rows, adding default values for new columns
+        for (Row row : table.getRows()) {
+            row.addCell(columnName, new Cell(columnName, ""));
+        }
+
+        saveTable(table, table.getName());
+        return "[OK]";
+    }
+
+    private String dropColumn(Table table, String columnName) throws IOException {
+        // Checking column exist
+        Column columnToRemove = null;
+        for (Column column : table.getColumns()) {
+            if (column.getName().equals(columnName)) { // sensitive case
+                columnToRemove = column;
+                break;
+            }
+        }
+
+        if (columnToRemove == null) {
+            return "[ERROR]: Column not found: " + columnName;
+        }
+
+        // Delete column
+        table.getColumns().remove(columnToRemove);
+
+        // Update all rows, deleting the data in this column
+        for (Row row : table.getRows()) {
+            row.getCells().remove(columnName);
+        }
+
+        saveTable(table, table.getName());
+        return "[OK]";
     }
 
     // Save the table to the corresponding file
