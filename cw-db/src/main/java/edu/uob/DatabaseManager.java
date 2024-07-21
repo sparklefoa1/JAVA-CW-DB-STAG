@@ -552,6 +552,15 @@ public class DatabaseManager {
                             .orElse(null);
                     if (cell != null) {
                         cell.setValue(update.getValue());
+                        // Updating column type
+                        Column column = table.getColumns().stream()
+                                .filter(c -> c.getName().equals(update.getKey()))
+                                .findFirst()
+                                .orElse(null);
+                        if (column != null) {
+                            column.setDataType(inferDataType(update.getValue()));
+                        }
+
                     } else {
                         return "[ERROR]: Column not found: " + update.getKey();
                     }
@@ -599,6 +608,26 @@ public class DatabaseManager {
         return updates;
     }
 
+    private String inferDataType(String value) {
+        if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+            return "Boolean";
+        } else if (value.equalsIgnoreCase("NULL")) {
+            return "NULL";
+        } else {
+            try {
+                Integer.parseInt(value);
+                return "Integer";
+            } catch (NumberFormatException e1) {
+                try {
+                    Float.parseFloat(value);
+                    return "Float";
+                } catch (NumberFormatException e2) {
+                    return "String";
+                }
+            }
+        }
+    }
+
     public String alterTable(String tableName, String alterationType, String attributeName) throws IOException {
         if (currentDatabase == null) {
             return "[ERROR]: No database is currently set up";
@@ -640,7 +669,7 @@ public class DatabaseManager {
 
         // Update all rows, adding default values for new columns
         for (Row row : table.getRows()) {
-            row.addCell(columnName, new Cell(columnName, ""));
+            row.addCell(columnName, new Cell(columnName, "NULL"));
         }
 
         saveTable(table, table.getName());

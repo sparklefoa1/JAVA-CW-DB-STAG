@@ -49,11 +49,12 @@ public class CmdPTests {
             //testCommandParser = new CommandParser(" select name, id from marks where pass == false and id > 3; ");
             //System.out.println(testCommandParser.checkSyntax());
 
-            //testCommandParser = new CommandParser(" UPDATE marks SET mark = 38 WHERE name == 'Chris' ; ");
-            //System.out.println(testCommandParser.checkSyntax());
-
-            testCommandParser = new CommandParser(" ALTER     TABLE marks drop Id ; ");
+            testCommandParser = new CommandParser(" UPDATE marks SET ages = 38 WHERE name == 'Chris' ; ");
             System.out.println(testCommandParser.checkSyntax());
+
+            //testCommandParser = new CommandParser(" ALTER     TABLE marks add ages ; ");
+            //System.out.println(testCommandParser.checkSyntax());
+            System.out.println(DatabaseManager.getInstance().getCurrentDatabase().getTable("marks").getColumns().get(4).getDataType());
 
             /*testCommandParser = new CommandParser(" DELETE FROM marks WHERE mark < 40; ");
             System.out.println(testCommandParser.checkSyntax());

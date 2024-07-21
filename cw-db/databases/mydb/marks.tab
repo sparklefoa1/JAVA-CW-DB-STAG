@@ -1,5 +1,5 @@
-id	name	mark	pass
-1	Simon	65	TRUE
-2	Sion	55	TRUE
-3	Rob	35	FALSE
-4	Chris	38	FALSE
+id	name	mark	pass	ages
+1	Simon	65	TRUE	NULL
+2	Sion	55	TRUE	NULL
+3	Rob	35	FALSE	NULL
+4	Chris	38	FALSE	38
