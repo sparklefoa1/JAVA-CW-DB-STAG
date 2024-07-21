@@ -489,9 +489,9 @@ public class DatabaseManager {
                     try {
                         switch (comparator.toUpperCase()) {
                             case "==":
-                                return cellValue.equals(value);
+                                return cellValue.equalsIgnoreCase(value);
                             case "!=":
-                                return !cellValue.equals(value);
+                                return !cellValue.equalsIgnoreCase(value);
                             case "<":
                                 return Double.parseDouble(cellValue) < Double.parseDouble(value);
                             case ">":
@@ -514,5 +514,117 @@ public class DatabaseManager {
         }
 
         return false;
+    }
+
+    public String updateTable(String tableName, String nameValueList, String condition) throws IOException {
+        if (currentDatabase == null) {
+            return "[ERROR]: No database is currently set up";
+        }
+
+        if (isReservedKeyword(tableName)) {
+           return "[ERROR]: Table name cannot be reserved words";
+        }
+
+        Table table = currentDatabase.getTable(tableName);
+        if (table == null) {
+            return "[ERROR]: Table does not exist";
+        }
+
+        // Parsing NameValueList
+        Map<String, String> updates = parseNameValueList(nameValueList);
+        if (updates == null) {
+            return "[ERROR]: Invalid NameValueList syntax";
+        }
+
+        // Updating row in the table
+        List<Row> rows = table.getRows();
+        boolean updated = false;
+        for (Row row : rows) {
+            if (evaluateCondition(row, table.getColumns(), condition)) {
+                for (Map.Entry<String, String> update : updates.entrySet()) {
+                    if (update.getKey().equalsIgnoreCase("id")) {
+                        return "[ERROR]: Cannot update ID column";
+                    }
+
+                    Cell cell = row.getCells().stream()
+                            .filter(c -> c.getColumnName().equals(update.getKey()))
+                            .findFirst()
+                            .orElse(null);
+                    if (cell != null) {
+                        cell.setValue(update.getValue());
+                    } else {
+                        return "[ERROR]: Column not found: " + update.getKey();
+                    }
+                }
+                updated = true;
+            }
+        }
+
+        if (updated) {
+            saveTable(table, tableName);
+            return "[OK]";
+        } else {
+            //return "test";
+            throw new IOException("No rows matched the condition");
+        }
+    }
+
+    private Map<String, String> parseNameValueList(String nameValueList) {
+        Map<String, String> updates = new HashMap<>();
+        String[] pairs = nameValueList.split(",");
+        for (String pair : pairs) {
+            String[] nameValue = pair.split("=");
+            if (nameValue.length != 2) {
+                return null;
+            }
+            String attributeName = nameValue[0].trim();
+            String value = nameValue[1].trim();
+
+            // Remove single quotes for string literals
+            if (value.startsWith("'") && value.endsWith("'")) {
+                value = value.substring(1, value.length() - 1);
+            }
+
+            // Convert boolean literals to uppercase
+            if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+                value = value.toUpperCase();
+            }
+
+            // Cannot update ID column
+            if (attributeName.equalsIgnoreCase("id")) {
+                return null;
+            }
+
+            updates.put(attributeName, value);
+        }
+        return updates;
+    }
+
+    // Save the table to the corresponding file
+    private void saveTable(Table table, String tableName) throws IOException {
+        String tableFilePath = ROOT_DIRECTORY + File.separator + currentDatabase.getName() + File.separator + tableName + ".tab";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(tableFilePath))) {
+            // Writing columns names
+            List<Column> columns = table.getColumns();
+            for (int i = 0; i < columns.size(); i++) {
+                if (i > 0) {
+                    writer.write("\t");
+                }
+                writer.write(columns.get(i).getName());
+            }
+            writer.newLine();
+
+            // Writing rows data
+            List<Row> rows = table.getRows();
+            for (Row row : rows) {
+                for (int i = 0; i < columns.size(); i++) {
+                    if (i > 0) {
+                        writer.write("\t");
+                    }
+                    writer.write(row.getCell(columns.get(i).getName()).getValue());
+                }
+                writer.newLine();
+            }
+        }
     }
 }

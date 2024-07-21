@@ -33,13 +33,23 @@ public class CmdPTests {
             //testCommandParser = new CommandParser(" drop table marks; ");
             //System.out.println(testCommandParser.checkSyntax());
 
-            //testCommandParser = new CommandParser(" insert into marks values('chris', 20, false); ");
-            //System.out.println(testCommandParser.checkSyntax());
+            /*testCommandParser = new CommandParser(" insert into marks values('Simon', 65, true); ");
+            System.out.println(testCommandParser.checkSyntax());
+            testCommandParser = new CommandParser(" insert into marks values('Sion', 55, true); ");
+            System.out.println(testCommandParser.checkSyntax());
+            testCommandParser = new CommandParser(" insert into marks values('Rob', 35, false); ");
+            System.out.println(testCommandParser.checkSyntax());
+
+            testCommandParser = new CommandParser(" insert into marks values('Chris', 20, false); ");
+            System.out.println(testCommandParser.checkSyntax());*/
 
             //testCommandParser = new CommandParser(" select pass, id from marks; ");
             //System.out.println(testCommandParser.checkSyntax());
 
-            testCommandParser = new CommandParser(" select * from marks where pass == false and name > i; ");
+            //testCommandParser = new CommandParser(" select name, id from marks where pass == false and id > 3; ");
+            //System.out.println(testCommandParser.checkSyntax());
+
+            testCommandParser = new CommandParser(" UPDATE marks SET mark = 38 WHERE name == 'Chris' ; ");
             System.out.println(testCommandParser.checkSyntax());
 
             /*testCommandParser = new CommandParser(" DELETE FROM marks WHERE mark < 40; ");
@@ -61,9 +71,6 @@ public class CmdPTests {
             System.out.println(testCommandParser.checkSyntax());
 
             testCommandParser = new CommandParser(" SELECT * FROM marks WHERE name != 'Sion'; ");
-            System.out.println(testCommandParser.checkSyntax());
-
-            testCommandParser = new CommandParser(" UPDATE marks SET mark = 38 WHERE name == 'Chris'; ");
             System.out.println(testCommandParser.checkSyntax());*/
         } catch (IOException e) {
             System.err.println("ioe error");

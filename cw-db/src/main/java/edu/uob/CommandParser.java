@@ -3,6 +3,7 @@ package edu.uob;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class CommandParser {
     private Token tokens = new Token();
@@ -314,7 +315,6 @@ public class CommandParser {
         String upperCaseCondition = trimmedCondition.toUpperCase();
         for (String operator : boolOperators) {
             int operatorIndex = upperCaseCondition.indexOf(operator);
-            //System.out.println(operatorIndex);
             if (operatorIndex != -1) {
                 String leftCondition = trimmedCondition.substring(0, operatorIndex).trim();
                 String rightCondition = trimmedCondition.substring(operatorIndex + operator.length()).trim();
@@ -332,17 +332,12 @@ public class CommandParser {
         return checkConditions(trimmedCondition);
     }
 
-    private boolean checkConditions(String condition) {
+    private boolean checkConditions(String condition)  {
         String[] parts = condition.split("\\s+");
         if (parts.length >= 3) {
             String attributeName = parts[0];
             String comparator = parts[1];
             String value = parts[2];
-
-            // Remove single quotes for string literals
-            if (value.startsWith("'") && value.endsWith("'")) {
-                value = value.substring(1, value.length() - 1);
-            }
 
             // Convert boolean literals to uppercase
             if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
@@ -355,19 +350,25 @@ public class CommandParser {
         return false;
     }
 
-    private String checkUpdateSyntax() {
+    private String checkUpdateSyntax() throws IOException {
         if (commandTokens.size() < 7) {
             return "[ERROR]: UPDATE syntax error";
         }
 
-        int setIndex = commandTokens.indexOf("SET");
-        if (setIndex == -1 || setIndex < 2 || setIndex >= commandTokens.size() - 2) {
-            return "[ERROR]: UPDATE syntax error 1";
+        int setIndex = -1;
+        int whereIndex = -1;
+        for (int i = 0; i < commandTokens.size(); i++) {
+            if (commandTokens.get(i).equalsIgnoreCase("SET")) {
+                setIndex = i;
+            } else if (commandTokens.get(i).equalsIgnoreCase("WHERE")) {
+                whereIndex = i;
+            }
         }
-
-        int whereIndex = commandTokens.indexOf("WHERE");
+        if (setIndex < 2 || setIndex >= commandTokens.size() - 2) {
+            return "[ERROR]: UPDATE syntax error: SET";
+        }
         if (whereIndex == -1 || whereIndex <= setIndex + 1 || whereIndex >= commandTokens.size() - 4) {
-            return "[ERROR]: UPDATE syntax error 2";
+            return "[ERROR]: UPDATE syntax error: WHERE";
         }
 
         String tableName = commandTokens.get(1);
@@ -385,7 +386,9 @@ public class CommandParser {
             return "[ERROR]: Invalid Condition";
         }
 
-        return "[OK]";
+
+        String updateResult = DatabaseManager.getInstance().updateTable(tableName, nameValueList, condition);
+        return updateResult;
     }
 
     private boolean isNameValueListValid(String nameValueList) {
