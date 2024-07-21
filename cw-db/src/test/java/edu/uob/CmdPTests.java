@@ -24,7 +24,7 @@ public class CmdPTests {
 
             testCommandParser = new CommandParser(" use mydb; ");
             System.out.println(testCommandParser.checkSyntax());// 在这里设置了current database
-            //testCommandParser = new CommandParser(" CREATE TABLE markS(name, mark, pass, name); ");
+            //testCommandParser = new CommandParser(" CREATE TABLE markS(name, mark, pass); ");
             //System.out.println(testCommandParser.checkSyntax());
 
             //testCommandParser = new CommandParser(" drop database testdb; ");
@@ -49,17 +49,17 @@ public class CmdPTests {
             //testCommandParser = new CommandParser(" select name, id from marks where pass == false and id > 3; ");
             //System.out.println(testCommandParser.checkSyntax());
 
-            testCommandParser = new CommandParser(" UPDATE marks SET ages = 38 WHERE name == 'Chris' ; ");
-            System.out.println(testCommandParser.checkSyntax());
+            //testCommandParser = new CommandParser(" UPDATE marks SET ages = 38 WHERE name == 'Chris' ; ");
+            //System.out.println(testCommandParser.checkSyntax());
 
             //testCommandParser = new CommandParser(" ALTER     TABLE marks add ages ; ");
             //System.out.println(testCommandParser.checkSyntax());
-            System.out.println(DatabaseManager.getInstance().getCurrentDatabase().getTable("marks").getColumns().get(4).getDataType());
+            //System.out.println(DatabaseManager.getInstance().getCurrentDatabase().getTable("marks").getColumns().get(4).getDataType());
 
-            /*testCommandParser = new CommandParser(" DELETE FROM marks WHERE mark < 40; ");
-            System.out.println(testCommandParser.checkSyntax());
+            //testCommandParser = new CommandParser(" DELETE FROM marks WHERE mark < 40; ");
+            //System.out.println(testCommandParser.checkSyntax());
 
-            testCommandParser = new CommandParser(" SELECT name FROM marks WHERE mark > 60; ");
+            /*testCommandParser = new CommandParser(" SELECT name FROM marks WHERE mark > 60; ");
             System.out.println(testCommandParser.checkSyntax());
 
             testCommandParser = new CommandParser(" Drop     TABLE myTable ; ");
@@ -74,7 +74,7 @@ public class CmdPTests {
             testCommandParser = new CommandParser(" SELECT * FROM marks WHERE name != 'Sion'; ");
             System.out.println(testCommandParser.checkSyntax());*/
         } catch (IOException e) {
-            System.err.println("ioe error");
+            System.err.println("test: ioe error");
         }
     }
 }

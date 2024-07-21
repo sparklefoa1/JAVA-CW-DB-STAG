@@ -418,13 +418,13 @@ public class CommandParser {
         return isPlainText(parts[0].trim()) && isValue(parts[1].trim());
     }
 
-    private String checkDeleteSyntax() {
+    private String checkDeleteSyntax() throws IOException {
         if (commandTokens.size() < 6) {
             return "[ERROR]: DELETE syntax error";
         }
 
         if (!commandTokens.get(1).equalsIgnoreCase("FROM")) {
-            return "[ERROR]: DELETE syntax error 1";
+            return "[ERROR]: DELETE syntax error: FROM";
         }
 
         String tableName = commandTokens.get(2);
@@ -433,7 +433,7 @@ public class CommandParser {
         }
 
         if (!commandTokens.get(3).equalsIgnoreCase("WHERE")) {
-            return "[ERROR]: DELETE syntax error 2";
+            return "[ERROR]: DELETE syntax error: WHERE";
         }
 
         String condition = String.join(" ", commandTokens.subList(4, commandTokens.size() - 1));
@@ -441,7 +441,8 @@ public class CommandParser {
             return "[ERROR]: Invalid Condition";
         }
 
-        return "[OK]";
+        String deleteResult = DatabaseManager.getInstance().deleteFromTable(tableName, condition);
+        return deleteResult;
     }
 
     private String checkJoinSyntax() {

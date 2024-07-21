@@ -702,6 +702,41 @@ public class DatabaseManager {
         return "[OK]";
     }
 
+    public String deleteFromTable(String tableName, String condition) throws IOException {
+        if (currentDatabase == null) {
+            return "[ERROR]: No database is currently set up";
+        }
+
+        if (isReservedKeyword(tableName)) {
+            return "[ERROR]: Table name cannot be reserved words";
+        }
+
+        Table table = currentDatabase.getTable(tableName);
+        if (table == null) {
+            return "[ERROR]: Table does not exist";
+        }
+
+        // Deleting rows from the table
+        List<Row> rows = table.getRows();
+        boolean deleted = false;
+        // Avoiding ConcurrentModificationException, use iterators to safely traverse and modify the collection
+        Iterator<Row> iterator = rows.iterator();
+        while (iterator.hasNext()) {
+            Row row = iterator.next();
+            if (evaluateCondition(row, table.getColumns(), condition)) {
+                iterator.remove();
+                deleted = true;
+            }
+        }
+
+        if (deleted) {
+            saveTable(table, tableName);
+            return "[OK]";
+        } else {
+            throw new IOException("No rows matched the condition");
+        }
+    }
+
     // Save the table to the corresponding file
     private void saveTable(Table table, String tableName) throws IOException {
         String tableFilePath = ROOT_DIRECTORY + File.separator + currentDatabase.getName() + File.separator + tableName + ".tab";
