@@ -361,7 +361,7 @@ public class CommandParser {
     }
 
     private String checkUpdateSyntax() throws IOException {
-        if (commandTokens.size() < 7) {
+        if (commandTokens.size() < 7 || !commandTokens.get(commandTokens.size() - 1).equals(";")) {
             return "[ERROR]: UPDATE syntax error";
         }
 
@@ -419,7 +419,7 @@ public class CommandParser {
     }
 
     private String checkDeleteSyntax() throws IOException {
-        if (commandTokens.size() < 6) {
+        if (commandTokens.size() < 6 || !commandTokens.get(commandTokens.size() - 1).equals(";")) {
             return "[ERROR]: DELETE syntax error";
         }
 
@@ -446,11 +446,14 @@ public class CommandParser {
     }
 
     private String checkJoinSyntax() {
-        if (commandTokens.size() != 9) {
+        if (commandTokens.size() != 9 || !commandTokens.get(commandTokens.size() - 1).equals(";")) {
             return "[ERROR]: JOIN syntax error";
         }
 
-        if (!isPlainText(commandTokens.get(1))) {
+        String tableName1 = commandTokens.get(1);
+        String tableName2 = commandTokens.get(3);
+
+        if (!isPlainText(tableName1)) {
             return "[ERROR]: Invalid first TableName";
         }
 
@@ -458,7 +461,7 @@ public class CommandParser {
             return "[ERROR]: Expected 'AND' after first TableName";
         }
 
-        if (!isPlainText(commandTokens.get(3))) {
+        if (!isPlainText(tableName2)) {
             return "[ERROR]: Invalid second TableName";
         }
 
@@ -466,7 +469,10 @@ public class CommandParser {
             return "[ERROR]: Expected 'ON' after second TableName";
         }
 
-        if (!isPlainText(commandTokens.get(5))) {
+        String attributeName1 = commandTokens.get(5);
+        String attributeName2 = commandTokens.get(7);
+
+        if (!isPlainText(attributeName1)) {
             return "[ERROR]: Invalid first AttributeName";
         }
 
@@ -474,11 +480,12 @@ public class CommandParser {
             return "[ERROR]: Expected 'AND' after first AttributeName";
         }
 
-        if (!isPlainText(commandTokens.get(7))) {
+        if (!isPlainText(attributeName2)) {
             return "[ERROR]: Invalid second AttributeName";
         }
 
-        return "[OK]";
+        String joinResult = DatabaseManager.getInstance().joinTables(tableName1, tableName2, attributeName1, attributeName2);
+        return "[OK]" + "\n" +joinResult;
     }
 
     private boolean isPlainText(String token) {

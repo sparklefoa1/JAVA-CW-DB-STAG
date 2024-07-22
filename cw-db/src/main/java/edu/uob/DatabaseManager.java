@@ -161,13 +161,14 @@ public class DatabaseManager {
         columnNames.add("id");
         for (String attribute : attributes) {
             attribute= attribute.trim();
+            String attributeLowerCase = attribute.toLowerCase();
             if (attribute.equalsIgnoreCase("id")) {
                 throw new IllegalArgumentException("[ERROR]: Manually updating the 'id' column is not allowed");
             }
-            if (isReservedKeyword(attribute)) {
+            if (isReservedKeyword(attribute) || isReservedKeyword(attribute)) {
                 throw new IllegalArgumentException("[ERROR]: Attribute cannot be reserved words");
             }
-            if (!columnNames.add(attribute)) {
+            if (!columnNames.add(attributeLowerCase)) {
                 throw new IllegalArgumentException("[ERROR]: duplicate column name " + attribute);
             }
             columns.add(attribute);
@@ -477,9 +478,9 @@ public class DatabaseManager {
             }
 
             for (Column column : columns) {
-                if (column.getName().equals(attributeName)) {
+                if (column.getName().equalsIgnoreCase(attributeName)) {
                     Cell cell = row.getCells().stream()
-                            .filter(c -> c.getColumnName().equals(attributeName))
+                            .filter(c -> c.getColumnName().equalsIgnoreCase(attributeName))
                             .findFirst()
                             .orElse(null);
                     if (cell == null) {
@@ -735,6 +736,85 @@ public class DatabaseManager {
         } else {
             throw new IOException("No rows matched the condition");
         }
+    }
+
+    public String joinTables(String tableName1, String tableName2, String attribute1, String attribute2) {
+        if (currentDatabase == null) {
+            return "[ERROR]: No database is currently set up";
+        }
+
+        if (isReservedKeyword(tableName1)
+                || isReservedKeyword(tableName2)
+                || isReservedKeyword(attribute1)
+                || isReservedKeyword(attribute2)) {
+            return "[ERROR]: Table names and attributes cannot be reserved words";
+        }
+
+        Table table1 = currentDatabase.getTable(tableName1);
+        Table table2 = currentDatabase.getTable(tableName2);
+
+        if (table1 == null || table2 == null) {
+            return "[ERROR]: One or both tables do not exist";
+        }
+
+        // Check if the join attributes are valid, if not 'id'
+        if (!attribute1.equalsIgnoreCase("id") && table1.getColumn(attribute1) == null) {
+            return "[ERROR]: Attribute " + attribute1 + " does not exist in " + tableName1;
+        }
+        if (!attribute2.equalsIgnoreCase("id") && table2.getColumn(attribute2) == null) {
+            return "[ERROR]: Attribute " + attribute2 + " does not exist in " + tableName2;
+        }
+
+        StringBuilder result = new StringBuilder();
+        result.append("id");
+
+        // Add column names: OriginalTableName.AttributeName
+        for (Column column : table1.getColumns()) {
+            if (!column.getName().equalsIgnoreCase("id") && !column.getName().equalsIgnoreCase(attribute1)) {
+                result.append("\t").append(tableName1).append(".").append(column.getName());
+            }
+        }
+        for (Column column : table2.getColumns()) {
+            if (!column.getName().equalsIgnoreCase("id") && !column.getName().equalsIgnoreCase(attribute2)) {
+                result.append("\t").append(tableName2).append(".").append(column.getName());
+            }
+        }
+        result.append("\n");
+
+        List<Row> rows1 = table1.getRows();
+        List<Row> rows2 = table2.getRows();
+
+        int idCounter = 1;
+        for (Row row1 : rows1) {
+            String value1 = attribute1.equalsIgnoreCase("id") ? String.valueOf(row1.getId()) : row1.getCell(attribute1).getValue();
+            for (Row row2 : rows2) {
+                String value2 = attribute2.equalsIgnoreCase("id") ? String.valueOf(row2.getId()) : row2.getCell(attribute2).getValue();
+                if (value1.equals(value2)) {
+                    result.append(idCounter++);
+
+                    // Add table1 column data
+                    for (Column column : table1.getColumns()) {
+                        if (!column.getName().equalsIgnoreCase("id") && !column.getName().equalsIgnoreCase(attribute1)) {
+                            result.append("\t").append(row1.getCell(column.getName()).getValue());
+                        }
+                    }
+                    // Add table2 column data
+                    for (Column column : table2.getColumns()) {
+                        if (!column.getName().equalsIgnoreCase("id") && !column.getName().equalsIgnoreCase(attribute2)) {
+                            result.append("\t").append(row2.getCell(column.getName()).getValue());
+                        }
+                    }
+                    result.append("\n");
+                }
+            }
+        }
+
+        return result.toString();
+    }
+
+    private String getCellValue(Row row, String columnName) {
+        Cell cell = row.getCell(columnName);
+        return cell != null ? cell.getValue() : "";
     }
 
     // Save the table to the corresponding file

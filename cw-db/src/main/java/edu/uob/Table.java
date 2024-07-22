@@ -41,4 +41,13 @@ public class Table {
         nextId++;
         return row;
     }
+
+    public Column getColumn(String columnName) {
+        for (Column column : columns) {
+            if (column.getName().equals(columnName)) {
+                return column;
+            }
+        }
+        return null;
+    }
 }

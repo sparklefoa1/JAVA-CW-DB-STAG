@@ -24,7 +24,7 @@ public class CmdPTests {
 
             testCommandParser = new CommandParser(" use mydb; ");
             System.out.println(testCommandParser.checkSyntax());// 在这里设置了current database
-            //testCommandParser = new CommandParser(" CREATE TABLE markS(name, mark, pass); ");
+            //testCommandParser = new CommandParser(" CREATE TABLE coursework(task, submission); ");
             //System.out.println(testCommandParser.checkSyntax());
 
             //testCommandParser = new CommandParser(" drop database testdb; ");
@@ -33,15 +33,15 @@ public class CmdPTests {
             //testCommandParser = new CommandParser(" drop table marks; ");
             //System.out.println(testCommandParser.checkSyntax());
 
-            /*testCommandParser = new CommandParser(" insert into marks values('Simon', 65, true); ");
+            /*testCommandParser = new CommandParser(" insert into coursework values('OXO', 3); ");
             System.out.println(testCommandParser.checkSyntax());
-            testCommandParser = new CommandParser(" insert into marks values('Sion', 55, true); ");
-            System.out.println(testCommandParser.checkSyntax());
-            testCommandParser = new CommandParser(" insert into marks values('Rob', 35, false); ");
-            System.out.println(testCommandParser.checkSyntax());
-
-            testCommandParser = new CommandParser(" insert into marks values('Chris', 20, false); ");
+            testCommandParser = new CommandParser(" insert into coursework values('DB', 1); ");
             System.out.println(testCommandParser.checkSyntax());*/
+            //testCommandParser = new CommandParser(" insert into marks values('Rob', 35, FALSE); ");
+            //System.out.println(testCommandParser.checkSyntax());
+
+            //testCommandParser = new CommandParser(" insert into marks values('Chris', 20, FALSE); ");
+            //System.out.println(testCommandParser.checkSyntax());
 
             //testCommandParser = new CommandParser(" select pass, id from marks; ");
             //System.out.println(testCommandParser.checkSyntax());
@@ -56,19 +56,19 @@ public class CmdPTests {
             //System.out.println(testCommandParser.checkSyntax());
             //System.out.println(DatabaseManager.getInstance().getCurrentDatabase().getTable("marks").getColumns().get(4).getDataType());
 
-            //testCommandParser = new CommandParser(" DELETE FROM marks WHERE mark < 40; ");
+            //testCommandParser = new CommandParser(" DELETE FROM marks WHERE id > 4; ");
             //System.out.println(testCommandParser.checkSyntax());
 
             /*testCommandParser = new CommandParser(" SELECT name FROM marks WHERE mark > 60; ");
             System.out.println(testCommandParser.checkSyntax());
 
             testCommandParser = new CommandParser(" Drop     TABLE myTable ; ");
-            System.out.println(testCommandParser.checkSyntax());
+            System.out.println(testCommandParser.checkSyntax());*/
 
             testCommandParser = new CommandParser(" JOIN coursework AND marks ON submission AND id; ");
             System.out.println(testCommandParser.checkSyntax());
 
-            testCommandParser = new CommandParser(" INSERT INTO myTable VALUES ( 'chris', 65, 42 ); ");
+            /*testCommandParser = new CommandParser(" INSERT INTO myTable VALUES ( 'chris', 65, 42 ); ");
             System.out.println(testCommandParser.checkSyntax());
 
             testCommandParser = new CommandParser(" SELECT * FROM marks WHERE name != 'Sion'; ");
