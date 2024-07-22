@@ -49,8 +49,8 @@ public class CmdPTests {
             //testCommandParser = new CommandParser(" select name, id from marks where pass == false and id > 3; ");
             //System.out.println(testCommandParser.checkSyntax());
 
-            //testCommandParser = new CommandParser(" UPDATE marks SET ages = 38 WHERE name == 'Chris' ; ");
-            //System.out.println(testCommandParser.checkSyntax());
+            testCommandParser = new CommandParser(" UPDATE marks SET marks = 38 WHERE join == 'Chris' ; ");
+            System.out.println(testCommandParser.checkSyntax());
 
             //testCommandParser = new CommandParser(" ALTER     TABLE marks add ages ; ");
             //System.out.println(testCommandParser.checkSyntax());
@@ -65,8 +65,8 @@ public class CmdPTests {
             testCommandParser = new CommandParser(" Drop     TABLE myTable ; ");
             System.out.println(testCommandParser.checkSyntax());*/
 
-            testCommandParser = new CommandParser(" JOIN coursework AND marks ON submission AND id; ");
-            System.out.println(testCommandParser.checkSyntax());
+            //testCommandParser = new CommandParser(" JOIN coursework AND marks ON submission AND id; ");
+            //System.out.println(testCommandParser.checkSyntax());
 
             /*testCommandParser = new CommandParser(" INSERT INTO myTable VALUES ( 'chris', 65, 42 ); ");
             System.out.println(testCommandParser.checkSyntax());

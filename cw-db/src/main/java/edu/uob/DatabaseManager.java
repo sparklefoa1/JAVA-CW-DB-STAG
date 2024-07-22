@@ -30,6 +30,7 @@ public class DatabaseManager {
         return instance;
     }
 
+    // Use method
     public void setCurrentDatabase(String databaseName) throws IOException {
         if (isReservedKeyword(databaseName)) {
             throw new IllegalArgumentException("[ERROR]: Database name cannot be reserved words");
@@ -104,6 +105,7 @@ public class DatabaseManager {
         return tabFile;
     }
 
+    // Create method
     public void createNewDatabase(String databaseName) throws IOException {
         if (isReservedKeyword(databaseName)) {
             throw new IllegalArgumentException("[ERROR]: Database name cannot be reserved words");
@@ -149,6 +151,7 @@ public class DatabaseManager {
         }
     }
 
+    // Add method
     public void addAttributesToTable(String tableName, String[] attributes) throws IOException {
         String tableFilePath = ROOT_DIRECTORY + File.separator + currentDatabase.getName() + File.separator + tableName + ".tab";
         File tableFile = new File(tableFilePath);
@@ -165,8 +168,8 @@ public class DatabaseManager {
             if (attribute.equalsIgnoreCase("id")) {
                 throw new IllegalArgumentException("[ERROR]: Manually updating the 'id' column is not allowed");
             }
-            if (isReservedKeyword(attribute) || isReservedKeyword(attribute)) {
-                throw new IllegalArgumentException("[ERROR]: Attribute cannot be reserved words");
+            if (isReservedKeyword(attribute)) {
+                throw new IllegalArgumentException("[ERROR]: Attribute name cannot be reserved words");
             }
             if (!columnNames.add(attributeLowerCase)) {
                 throw new IllegalArgumentException("[ERROR]: duplicate column name " + attribute);
@@ -188,6 +191,7 @@ public class DatabaseManager {
         }
     }
 
+    // Drop method
     public void deleteDatabase(String databaseName) throws IOException {
         if (isReservedKeyword(databaseName)) {
             throw new IllegalArgumentException("[ERROR]: Database name cannot be reserved words");
@@ -246,6 +250,7 @@ public class DatabaseManager {
         currentDatabase.removeTable(tableName);
     }
 
+    // Insert method
     public void insertIntoTable(String tableName, String[] values) throws IOException {
         if (currentDatabase == null) {
             throw new IllegalStateException("[ERROR]: No database is currently set up");
@@ -254,6 +259,10 @@ public class DatabaseManager {
         Table table = currentDatabase.getTable(tableName);
         if (table == null) {
             throw new FileNotFoundException("[ERROR]: Table does not exist");
+        }
+
+        if (isReservedKeyword(tableName)) {
+            throw new IllegalArgumentException("[ERROR]: Table name cannot be reserved words");
         }
 
         // Getting the number of columns in the table
@@ -325,43 +334,7 @@ public class DatabaseManager {
         table.addRow(row);
     }
 
-    public String selectAllFromTable(String tableName) throws IOException {
-        if (currentDatabase == null) {
-            throw new IllegalStateException("[ERROR]: No database is currently set up");
-        }
-
-        if (isReservedKeyword(tableName)) {
-            throw new IllegalArgumentException("[ERROR]: Table name cannot be reserved words");
-        }
-
-        Table table = currentDatabase.getTable(tableName);
-        if (table == null) {
-            throw new FileNotFoundException("[ERROR]: Table does not exist");
-        }
-
-        StringBuilder result = new StringBuilder();
-        List<Column> columns = table.getColumns();
-        List<Row> rows = table.getRows();
-
-        // Ready out columns names
-        for (Column column : columns) {
-            result.append(column.getName()).append("\t");
-        }
-        result.setLength(result.length() - 1); // Removing last tab
-        result.append("\n");
-
-        // Ready out rows data
-        for (Row row : rows) {
-            for (Cell cell : row.getCells()) {
-                result.append(cell.getValue()).append("\t");
-            }
-            result.setLength(result.length() - 1); // Removing last tab
-            result.append("\n");
-        }
-
-        return result.toString();
-    }
-
+    // Select method
     public String selectColumnsFromTable(String tableName, String wildAttribList, String condition) throws IOException {
         if (currentDatabase == null) {
             throw new IllegalStateException("[ERROR]: No database is currently set up");
@@ -390,7 +363,11 @@ public class DatabaseManager {
             // Getting attributes
             String[] attribArray = wildAttribList.split(",");
             for (String attrib : attribArray) {
-                selectedColumns.add(attrib.trim());
+                if (isReservedKeyword(attrib.trim())) {
+                    throw new IllegalArgumentException("[ERROR]: Attribute name cannot be reserved words");
+                } else {
+                    selectedColumns.add(attrib.trim());
+                }
             }
         }
 
@@ -467,6 +444,10 @@ public class DatabaseManager {
             String comparator = parts[1];
             String value = parts[2];
 
+            if (isReservedKeyword(attributeName)) {
+                throw new IllegalArgumentException("[ERROR]: Attribute name cannot be reserved words");
+            }
+
             // Remove single quotes for string literals
             if (value.startsWith("'") && value.endsWith("'")) {
                 value = value.substring(1, value.length() - 1);
@@ -517,6 +498,7 @@ public class DatabaseManager {
         return false;
     }
 
+    // Update method
     public String updateTable(String tableName, String nameValueList, String condition) throws IOException {
         if (currentDatabase == null) {
             return "[ERROR]: No database is currently set up";
@@ -578,7 +560,7 @@ public class DatabaseManager {
         }
     }
 
-    private Map<String, String> parseNameValueList(String nameValueList) {
+    private Map<String, String> parseNameValueList(String nameValueList) throws IllegalArgumentException {
         Map<String, String> updates = new HashMap<>();
         String[] pairs = nameValueList.split(",");
         for (String pair : pairs) {
@@ -588,6 +570,10 @@ public class DatabaseManager {
             }
             String attributeName = nameValue[0].trim();
             String value = nameValue[1].trim();
+
+            if (isReservedKeyword(attributeName)) {
+                throw new IllegalArgumentException("[ERROR]: Attribute name cannot be reserved words");
+            }
 
             // Remove single quotes for string literals
             if (value.startsWith("'") && value.endsWith("'")) {
@@ -629,13 +615,14 @@ public class DatabaseManager {
         }
     }
 
+    // Alter method
     public String alterTable(String tableName, String alterationType, String attributeName) throws IOException {
         if (currentDatabase == null) {
             return "[ERROR]: No database is currently set up";
         }
 
-        if (isReservedKeyword(tableName)) {
-            return "[ERROR]: Table name cannot be reserved words";
+        if (isReservedKeyword(tableName) || isReservedKeyword(attributeName)) {
+            return "[ERROR]: Table or Attribute name cannot be reserved words";
         }
 
         Table table = currentDatabase.getTable(tableName);
@@ -703,6 +690,7 @@ public class DatabaseManager {
         return "[OK]";
     }
 
+    // Delete method
     public String deleteFromTable(String tableName, String condition) throws IOException {
         if (currentDatabase == null) {
             return "[ERROR]: No database is currently set up";
@@ -738,6 +726,7 @@ public class DatabaseManager {
         }
     }
 
+    // Join method
     public String joinTables(String tableName1, String tableName2, String attribute1, String attribute2) {
         if (currentDatabase == null) {
             return "[ERROR]: No database is currently set up";
@@ -810,11 +799,6 @@ public class DatabaseManager {
         }
 
         return result.toString();
-    }
-
-    private String getCellValue(Row row, String columnName) {
-        Cell cell = row.getCell(columnName);
-        return cell != null ? cell.getValue() : "";
     }
 
     // Save the table to the corresponding file

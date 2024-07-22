@@ -248,7 +248,6 @@ public class CommandParser {
         return "[ERROR]: Invalid value list";
     }
 
-    // pending
     private String checkSelectSyntax() throws IOException {
         if (commandTokens.size() < 5 || !commandTokens.get(commandTokens.size() - 1).equals(";")) {
             return "[ERROR]: SELECT syntax error";
@@ -396,8 +395,13 @@ public class CommandParser {
             return "[ERROR]: Invalid Condition";
         }
 
-        String updateResult = DatabaseManager.getInstance().updateTable(tableName, nameValueList, condition);
-        return updateResult;
+        try {
+            String updateResult = DatabaseManager.getInstance().updateTable(tableName, nameValueList, condition);
+            return updateResult;
+        } catch (IllegalArgumentException e) {
+            return e.getMessage();
+        }
+
     }
 
     private boolean isNameValueListValid(String nameValueList) {

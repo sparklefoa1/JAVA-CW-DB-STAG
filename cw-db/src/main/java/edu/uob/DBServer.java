@@ -40,12 +40,15 @@ public class DBServer {
     */
     public String handleCommand(String command) {
         // TODO implement your server logic here
-        Token tokens = new Token();
-        ArrayList<String> commandTokens = tokens.setup(command);
+        //Token tokens = new Token();
+        //ArrayList<String> commandTokens = tokens.setup(command);
         try {
-            SyntaxCheck.command(commandTokens);
+            CommandParser parser = new CommandParser(command);
+            String result = parser.checkSyntax();
+            return result;
+            //SyntaxCheck.command(commandTokens);
         } catch (Exception e) {
-            return e.getMessage();
+            e.printStackTrace();
         }
         //Can only print results on the command line, no return value...
         //Parser.processTokens(commandTokens);
