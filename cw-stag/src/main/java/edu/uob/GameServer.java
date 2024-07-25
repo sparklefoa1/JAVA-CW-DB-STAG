@@ -77,6 +77,7 @@ public final class GameServer {
         }
         return "Invalid command";
     }
+
     public String checkMatch(String trigger) {
         HashSet<GameAction> actionSet = gameData.getGameActions(trigger);
         String narration = "Action failed";
@@ -292,6 +293,7 @@ public final class GameServer {
         }
         return narration;
     }
+
     public int checkCommand(int n, String command, String name) {
         String[] commandArray = command.split("\\s+");
         List<String> commandList = Arrays.asList(commandArray);
@@ -303,6 +305,7 @@ public final class GameServer {
         }
         return n;
     }
+
     public String basicCommand(String command) {
         int n = 0;
         if(command.contains("inventory") || command.contains("inv")) {

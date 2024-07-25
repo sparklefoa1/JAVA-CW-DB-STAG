@@ -526,6 +526,7 @@ public class CommandParser {
     private boolean isValue(String token) {
         return isStringLiteral(token) || isBooleanLiteral(token) || isFloatLiteral(token) || isIntegerLiteral(token) || isNullLiteral(token);
     }
+
     private boolean isStringLiteral(String token) {
         // BNF syntax
         return token.matches("'([\\sA-Za-z!#\\\\$%&()*+,\\-./:;>=<?@\\[\\]^_`{}~0-9]*)'");

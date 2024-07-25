@@ -21,12 +21,14 @@ public class GameData {
     private Map<String, Locations> locations;
     private List<String[]> paths;
     private HashMap<String, HashSet<GameAction>> actions;
+
     public GameData() {
         player = new GamePlayer();
         locations = new HashMap<>();
         paths = new ArrayList<>();
         actions = new HashMap<>();
     }
+
     public String gameOver() {
         if (player.getHealth() == 0) {
             Map<String, Artefacts> carryListArtefacts = player.getCarryList().getAllArtefacts();
@@ -41,19 +43,23 @@ public class GameData {
         }
         return "You are alive";
     }
+
     public void setInitialLocation(String initialLocationName) {
         Locations initialLocation = getLocation(initialLocationName);
         player.setInitialLocation(initialLocation);
         Locations initialCarryList = new Locations("carryList", "A player's carryList");
         player.setCarryList(initialCarryList);
     }
+
     public GamePlayer getPlayer() {
         return player;
     }
+
     // add location
     public void addLocation(String name, String description) {
         locations.put(name, new Locations(name, description));
     }
+
     // add artefact
     public void addArtefact(String locationName, String artefactName, String artefactDescription) {
         Locations location = locations.get(locationName);
@@ -61,6 +67,7 @@ public class GameData {
             location.addArtefact(artefactName, artefactDescription);
         }
     }
+
     // add furniture
     public void addFurniture(String locationName, String furnitureName, String furnitureDescription) {
         Locations location = locations.get(locationName);
@@ -68,6 +75,7 @@ public class GameData {
             location.addFurniture(furnitureName, furnitureDescription);
         }
     }
+
     // add character
     public void addCharacter(String locationName, String characterName, String characterDescription) {
         Locations location = locations.get(locationName);
@@ -75,6 +83,7 @@ public class GameData {
             location.addCharacter(characterName, characterDescription);
         }
     }
+
     // add path
     public void addPath(String from, String to) {
         paths.add(new String[]{from, to});
@@ -90,6 +99,7 @@ public class GameData {
 
     // set path
     public void setPaths(List<String[]> paths) {this.paths = paths;}
+
     // get path
     public List<String> getPaths(String fromName) {
         List<String> toLocations = new ArrayList<>();
@@ -100,10 +110,12 @@ public class GameData {
         }
         return toLocations;
     }
+
     // get all path
     public List<String[]> getAllPaths() {
         return paths;
     }
+
     // parse & store game data
     public void parseGameEntitiesFromFile(String filePath) throws FileNotFoundException, IOException, ParseException {
         Parser parser = new Parser();
@@ -192,9 +204,11 @@ public class GameData {
     public HashSet<GameAction> getGameActions(String triggerKeyphrase) {
         return actions.get(triggerKeyphrase);
     }
+
     public HashMap<String, HashSet<GameAction>> getAllActions() {
         return actions;
     }
+
     public void parseActionsFromFile(String filePath) throws ParserConfigurationException, SAXException, IOException {
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();

@@ -12,6 +12,7 @@ public class GameAction {
     private List<String> consumedEntities;
     private List<String> producedEntities;
     private String narration;
+
     public GameAction(List<String> triggerKeyphrases, List<String> subjectEntities, List<String> consumedEntities, List<String> producedEntities, String narration) {
         this.triggerKeyphrases = triggerKeyphrases;
         this.subjectEntities = subjectEntities;
@@ -22,10 +23,12 @@ public class GameAction {
     public List<String> getTriggerKeyphrases() {
         return triggerKeyphrases;
     }
+
     public List<String> getSubjectEntities()
     {
         return subjectEntities;
     }
+
     public List<String> getConsumedEntities() {
         return consumedEntities;
     }

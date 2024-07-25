@@ -34,13 +34,17 @@ public class Locations extends GameEntity {
     public Artefacts getArtefacts(String arteFactName) {
         return artefacts.get(arteFactName);
     }
+
     public Map<String, Artefacts> getAllArtefacts() {return artefacts;}
 
     public Furniture getFurniture(String furnitureName) {
         return furniture.get(furnitureName);
     }
+
     public Map<String, Furniture> getAllFurniture() {return furniture;}
+
     public Characters getCharacters(String characterName) {return characters.get(characterName);}
+
     public Map<String, Characters> getAllCharacters() {return characters;}
 
 }

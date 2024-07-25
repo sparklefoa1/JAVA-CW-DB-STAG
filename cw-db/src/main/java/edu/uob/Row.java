@@ -16,6 +16,7 @@ public class Row {
     public int getId() {
         return id;
     }
+
     public void addCell(String columnName, Cell cell) {
         cells.put(columnName, cell);
     }
