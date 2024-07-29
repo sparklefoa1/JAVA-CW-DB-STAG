@@ -11,10 +11,20 @@ import java.net.Socket;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public final class GameServer {
 
     private static final char END_OF_TRANSMISSION = 4;
+
+    // Built-in commands
+    public static final String CMD_INVENTORY = "inventory";
+    public static final String CMD_INV = "inv";
+    public static final String CMD_GET = "get";
+    public static final String CMD_DROP = "drop";
+    public static final String CMD_GOTO = "goto";
+    public static final String CMD_LOOK = "look";
+
     private GameData gameData;
 
     public static void main(String[] args) throws IOException {
@@ -57,7 +67,7 @@ public final class GameServer {
         command = command.toLowerCase();
         // Give response
         // Basic commands
-        String result = basicCommand(command);
+        String result = handleBasicCommand(command);
         if(!result.equalsIgnoreCase("Not basic command")) {
             return result;
         }
@@ -300,126 +310,185 @@ public final class GameServer {
         for (String commandClip : commandList) {
             if (commandClip.equalsIgnoreCase(name)) {
                 n++;
-                System.out.println(n);
+                //System.out.println(n);
             }
         }
         return n;
     }
 
-    public String basicCommand(String command) {
+    public String handleBasicCommand(String command) {
         int n = 0;
-        if(command.contains("inventory") || command.contains("inv")) {
-            Map<String, Artefacts> carryListArtefacts = gameData.getPlayer().getCarryList().getAllArtefacts();
-            List<String> inventoryArtefacts = new ArrayList<>();
-            for (Map.Entry<String, Artefacts> entry : carryListArtefacts.entrySet()) {
-                //String artefactName = entry.getKey();
-                Artefacts artefact = entry.getValue();
-                inventoryArtefacts.add(artefact.getName());
-            }
-            String inventoryResult = String.join(System.lineSeparator(), inventoryArtefacts);
-            return inventoryResult;
+        if (containsAny(command, CMD_INVENTORY, CMD_INV)) {
+            return handleInventory();
         }
-        if(command.contains("get")) {
-            Map<String, Artefacts> currentAllArtefacts = gameData.getPlayer().getCurrentLocation().getAllArtefacts();
-            for (Map.Entry<String, Artefacts> entry : currentAllArtefacts.entrySet()) {
-                String artefactName = entry.getKey();
-                n = checkCommand(n, command, artefactName);
-            }
-            if (n <= 1) {
-                for (Map.Entry<String, Artefacts> entry : currentAllArtefacts.entrySet()) {
-                    String artefactName = entry.getKey();
-                    Artefacts artefact = entry.getValue();
-                    if(command.contains(artefactName)) {
-                        gameData.getPlayer().getCarryList().addArtefact(artefactName, artefact.getDescription());
-                        currentAllArtefacts.remove(artefactName);
-                        return "You get " + artefactName + " from the " + gameData.getPlayer().getCurrentLocation().getName();
-                    }
-                }
-                return "You cannot get this artefact";
-            }
-            return "Invalid command";
+        if (command.contains(CMD_GET)) {
+            return handleGet(command);
         }
-        n = 0;
-        if(command.contains("drop")){
-            Map<String, Artefacts> storeroomArtefacts = gameData.getPlayer().getCarryList().getAllArtefacts();
-            for (Map.Entry<String, Artefacts> entry : storeroomArtefacts.entrySet()) {
-                String artefactName = entry.getKey();
-                n = checkCommand(n, command, artefactName);
-            }
-            if (n <= 1) {
-                for (Map.Entry<String, Artefacts> entry : storeroomArtefacts.entrySet()) {
-                    String artefactName = entry.getKey();
-                    Artefacts artefact = entry.getValue();
-                    if (command.contains(artefactName)) {
-                        gameData.getPlayer().getCurrentLocation().addArtefact(artefactName, artefact.getDescription());
-                        storeroomArtefacts.remove(artefactName);
-                        return "You drop " + artefactName + " to the " + gameData.getPlayer().getCurrentLocation().getName();
-                    }
-                }
-                return "You do not have this artefact";
-            }
-            return "Invalid command";
+        if (command.contains(CMD_DROP)) {
+            return handleDrop(command);
         }
-        n = 0;
-        if(command.contains("goto")){
-            Locations currentLocation = gameData.getPlayer().getCurrentLocation();
-            List<String> currentPath = gameData.getPaths(currentLocation.getName());
-            for (String path : currentPath) {
-                n = checkCommand(n, command, path);
-            }
-            if (n <= 1) {
-                for (String gotoPath : currentPath) {
-                    n = checkCommand(n, command, gotoPath);
-                    if (command.contains(gotoPath)) {
-                        gameData.getPlayer().setCurrentLocation(gameData.getLocation(gotoPath));
-                        return "You have gone to the " + gotoPath;
-                    }
-                }
-                return "You cannot go to there";
-            }
-            return "Invalid command";
+        if (command.contains(CMD_GOTO)) {
+            return handleGoto(command);
         }
-        if(command.contains("look")){
-            List<String> lookResult = new ArrayList<>();
-            Locations currentLocation = gameData.getPlayer().getCurrentLocation();
-            lookResult.add("You are in the " + currentLocation.getName() + ": " + currentLocation.getDescription());
-            if(!currentLocation.getAllArtefacts().isEmpty()){
-                lookResult.add("There are artefacts: ");
-                Map<String, Artefacts> currentAllArtefacts = currentLocation.getAllArtefacts();
-                List<String> currentArtefacts = new ArrayList<>();
-                for (Map.Entry<String, Artefacts> entry : currentAllArtefacts.entrySet()) {
-                    Artefacts artefact = entry.getValue();
-                    currentArtefacts.add(artefact.getName() + ": " + artefact.getDescription());
-                }
-                lookResult.addAll(currentArtefacts);
-            }
-            if(!currentLocation.getAllFurniture().isEmpty()){
-                lookResult.add("There are furniture: ");
-                Map<String, Furniture> currentAllFurniture = currentLocation.getAllFurniture();
-                List<String> currentFurniture = new ArrayList<>();
-                for (Map.Entry<String, Furniture> entry : currentAllFurniture.entrySet()) {
-                    Furniture furniture = entry.getValue();
-                    currentFurniture.add(furniture.getName() + ": " + furniture.getDescription());
-                }
-                lookResult.addAll(currentFurniture);
-            }
-            if(!currentLocation.getAllCharacters().isEmpty()){
-                lookResult.add("There are Characters: ");
-                Map<String, Characters> currentAllCharacters = currentLocation.getAllCharacters();
-                List<String> currentCharacters = new ArrayList<>();
-                for (Map.Entry<String, Characters> entry : currentAllCharacters.entrySet()) {
-                    Characters character = entry.getValue();
-                    currentCharacters.add(character.getName() + ": " + character.getDescription());
-                }
-                lookResult.addAll(currentCharacters);
-            }
-            List<String> currentPath = gameData.getPaths(currentLocation.getName());
-            lookResult.add("And you can goto: ");
-            lookResult.addAll(currentPath);
-            return String.join(System.lineSeparator(), lookResult);
+        if (command.contains(CMD_LOOK)) {
+            return handleLook();
         }
         return "Not basic command";
     }
+
+    // Check whether it is an inventory built-in command
+    private boolean containsAny(String command, String... keywords) {
+        for (String keyword : keywords) {
+            if (command.contains(keyword)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String handleInventory() {
+        // Get all items carried by the player
+        Map<String, Artefacts> carryListArtefacts = gameData.getPlayer().getCarryList().getAllArtefacts();
+        List<String> inventoryArtefacts = new ArrayList<>();
+
+        // Add all artefacts
+        for (Artefacts artefact : carryListArtefacts.values()) {
+            String artefactName = artefact.getName();
+            inventoryArtefacts.add(artefactName);
+        }
+        String inventoryResult = String.join(System.lineSeparator(), inventoryArtefacts);
+
+        return inventoryResult;
+    }
+
+    private String handleGet(String command) {
+        int n = 0;
+        Map<String, Artefacts> currentAllArtefacts = gameData.getPlayer().getCurrentLocation().getAllArtefacts();
+        for (String artefactName : currentAllArtefacts.keySet()) {
+            n = checkCommand(n, command, artefactName);
+        }
+        if (n <= 1) {
+            for (Map.Entry<String, Artefacts> entry : currentAllArtefacts.entrySet()) {
+                String artefactName = entry.getKey();
+                Artefacts artefact = entry.getValue();
+                if (command.contains(artefactName)) {
+                    gameData.getPlayer().getCarryList().addArtefact(artefactName, artefact.getDescription());
+                    currentAllArtefacts.remove(artefactName);
+                    return "You get " + artefactName + " from the " + gameData.getPlayer().getCurrentLocation().getName();
+                }
+            }
+            return "You cannot get this artefact";
+        }
+        return "Invalid command";
+    }
+
+    private String handleDrop(String command) {
+        int n = 0;
+        Map<String, Artefacts> storeroomArtefacts = gameData.getPlayer().getCarryList().getAllArtefacts();
+        for (String artefactName : storeroomArtefacts.keySet()) {
+            n = checkCommand(n, command, artefactName);
+        }
+        if (n <= 1) {
+            for (Map.Entry<String, Artefacts> entry : storeroomArtefacts.entrySet()) {
+                String artefactName = entry.getKey();
+                Artefacts artefact = entry.getValue();
+                if (command.contains(artefactName)) {
+                    gameData.getPlayer().getCurrentLocation().addArtefact(artefactName, artefact.getDescription());
+                    storeroomArtefacts.remove(artefactName);
+                    return "You drop " + artefactName + " to the " + gameData.getPlayer().getCurrentLocation().getName();
+                }
+            }
+            return "You do not have this artefact";
+        }
+        return "Invalid command";
+    }
+
+    private String handleGoto(String command) {
+        int n = 0;
+        Locations currentLocation = gameData.getPlayer().getCurrentLocation();
+        List<String> currentPath = gameData.getPaths(currentLocation.getName());
+        for (String path : currentPath) {
+            n = checkCommand(n, command, path);
+        }
+        if (n <= 1) {
+            for (String gotoPath : currentPath) {
+                if (command.contains(gotoPath)) {
+                    gameData.getPlayer().setCurrentLocation(gameData.getLocation(gotoPath));
+                    return "You have gone to the " + gotoPath;
+                }
+            }
+            return "You cannot go to there";
+        }
+        return "Invalid command";
+    }
+
+    private String handleLook() {
+        List<String> lookResult = new ArrayList<>();
+        Locations currentLocation = gameData.getPlayer().getCurrentLocation();
+        lookResult.add("You are in the " + currentLocation.getName() + ": " + currentLocation.getDescription());
+
+        addArtefactsDescription(currentLocation, lookResult);
+        addFurnitureDescription(currentLocation, lookResult);
+        addCharactersDescription(currentLocation, lookResult);
+
+        List<String> currentPath = gameData.getPaths(currentLocation.getName());
+        lookResult.add("And you can goto: ");
+        lookResult.addAll(currentPath);
+
+        return String.join(System.lineSeparator(), lookResult);
+    }
+
+    private void addArtefactsDescription(Locations location, List<String> description) {
+        if (!location.getAllArtefacts().isEmpty()) {
+            description.add("There are artefacts: ");
+            Map<String, Artefacts> currentAllArtefacts = location.getAllArtefacts();
+
+            List<String> currentArtefacts = new ArrayList<>();
+            for (Map.Entry<String, Artefacts> entry : currentAllArtefacts.entrySet()) {
+                Artefacts artefact = entry.getValue();
+                String artefactDescription = artefact.getName() + ": " + artefact.getDescription();
+
+                currentArtefacts.add(artefactDescription);
+            }
+            // Add item description into description list
+            description.addAll(currentArtefacts);
+        }
+    }
+
+    private void addFurnitureDescription(Locations location, List<String> description) {
+        if (!location.getAllFurniture().isEmpty()) {
+            description.add("There are furniture: ");
+            Map<String, Furniture> currentAllFurniture = location.getAllFurniture();
+
+            List<String> currentFurniture = new ArrayList<>();
+            for (Map.Entry<String, Furniture> entry : currentAllFurniture.entrySet()) {
+                Furniture furniture = entry.getValue();
+                String furnitureDescription = furniture.getName() + ": " + furniture.getDescription();
+
+                currentFurniture.add(furnitureDescription);
+            }
+
+            description.addAll(currentFurniture);
+        }
+    }
+
+    private void addCharactersDescription(Locations location, List<String> description) {
+        if (!location.getAllCharacters().isEmpty()) {
+            description.add("There are Characters: ");
+            Map<String, Characters> currentAllCharacters = location.getAllCharacters();
+
+            List<String> currentCharacters = new ArrayList<>();
+            for (Map.Entry<String, Characters> entry : currentAllCharacters.entrySet()) {
+                Characters character = entry.getValue();
+                String characterDescription = character.getName() + ": " + character.getDescription();
+
+                currentCharacters.add(characterDescription);
+            }
+
+            description.addAll(currentCharacters);
+        }
+    }
+
 
     /**
     * Do not change the following method signature or we won't be able to mark your submission
