@@ -60,7 +60,7 @@ public class GameData {
         locations.put(name, new Locations(name, description));
     }
 
-    // add artefact
+    // Add artefact
     public void addArtefact(String locationName, String artefactName, String artefactDescription) {
         Locations location = locations.get(locationName);
         if (location != null) {
@@ -68,7 +68,7 @@ public class GameData {
         }
     }
 
-    // add furniture
+    // Add furniture
     public void addFurniture(String locationName, String furnitureName, String furnitureDescription) {
         Locations location = locations.get(locationName);
         if (location != null) {
@@ -76,7 +76,7 @@ public class GameData {
         }
     }
 
-    // add character
+    // Add character
     public void addCharacter(String locationName, String characterName, String characterDescription) {
         Locations location = locations.get(locationName);
         if (location != null) {
@@ -84,7 +84,7 @@ public class GameData {
         }
     }
 
-    // add path
+    // Add path
     public void addPath(String from, String to) {
         paths.add(new String[]{from, to});
     }
@@ -97,10 +97,10 @@ public class GameData {
         return locations;
     }
 
-    // set path
+    // Set path
     public void setPaths(List<String[]> paths) {this.paths = paths;}
 
-    // get path
+    // Get path
     public List<String> getPaths(String fromName) {
         List<String> toLocations = new ArrayList<>();
         for (String[] path : paths) {
@@ -111,96 +111,94 @@ public class GameData {
         return toLocations;
     }
 
-    // get all path
+    // Get all path
     public List<String[]> getAllPaths() {
         return paths;
     }
 
-    // parse & store game data
-    public void parseGameEntitiesFromFile(String filePath) throws FileNotFoundException, IOException, ParseException {
+    // Parse & store game entities data
+    public void parseGameEntitiesFromFile(String filePath) throws IOException, ParseException {
         Parser parser = new Parser();
-        FileReader reader = null;
-        BufferedReader bufferedReader = null;
-        try {
-            reader = new FileReader(filePath);
+        try (FileReader reader = new FileReader(filePath); BufferedReader bufferedReader = new BufferedReader(reader)) {
             parser.parse(reader);
             Graph wholeDocument = parser.getGraphs().get(0);
             ArrayList<Graph> sections = wholeDocument.getSubgraphs();
 
-            // Store locations & its contents
-            ArrayList<Graph> locations = sections.get(0).getSubgraphs();
-            // Initialize player location
-            Graph firstLocation = locations.get(0);
-            Node firstLocationDetails = firstLocation.getNodes(false).get(0);
-            String firstLocationName = firstLocationDetails.getId().getId();
-            // Keep store locations & its contents
-            for (Graph locationGraph : locations) {
-                Node locationDetails = locationGraph.getNodes(false).get(0);
-                String locationName = locationDetails.getId().getId();
-                String locationDescription = locationDetails.getAttribute("description");
-                // store locations data
-                addLocation(locationName, locationDescription);
-                //System.out.println(locationName + " " + locationDescription);
-                // store artefacts, furniture & characters data
-                ArrayList<Graph> subGraphs = locationGraph.getSubgraphs();
-                for (Graph subgraph : subGraphs) {
-                    if (subgraph.getId().getId().equals("artefacts")) {
-                        ArrayList<Node> artefactsNodes = subgraph.getNodes(false);
-                        for (Node artefactsNode : artefactsNodes) {
-                            String artefactsName = artefactsNode.getId().getId();
-                            String artefactsDescription = artefactsNode.getAttribute("description");
-                            addArtefact(locationName, artefactsName, artefactsDescription);
-                            //System.out.println(artefactsName + " " + artefactsDescription);
-                        }
-                    } else if (subgraph.getId().getId().equals("furniture")) {
-                        ArrayList<Node> furnitureNodes = subgraph.getNodes(false);
-                        for (Node furnitureNode : furnitureNodes) {
-                            String furnitureName = furnitureNode.getId().getId();
-                            String furnitureDescription = furnitureNode.getAttribute("description");
-                            addFurniture(locationName, furnitureName, furnitureDescription);
-                            //System.out.println(furnitureName + " " + furnitureDescription);
-                        }
-                    } else if (subgraph.getId().getId().equals("characters")) {
-                        ArrayList<Node> charactersNodes = subgraph.getNodes(false);
-                        for (Node charactersNode : charactersNodes) {
-                            String charactersName = charactersNode.getId().getId();
-                            String charactersDescription = charactersNode.getAttribute("description");
-                            addCharacter(locationName, charactersName, charactersDescription);
-                            //System.out.println(charactersName + " " + charactersDescription);
-                        }
-                    }
-                }
+            parseLocations(sections.get(0));
+            setInitialLocation(getFirstLocationName(sections.get(0)));
+            parsePaths(sections.get(1));
+        }
+    }
 
-            }
-            // Keep initialize player location & storeroom
-            setInitialLocation(firstLocationName);
-            // store paths
-            ArrayList<Edge> paths = sections.get(1).getEdges();
-            for (Edge path : paths) {
-                Node fromLocation = path.getSource().getNode();
-                String fromName = fromLocation.getId().getId();
-                Node toLocation = path.getTarget().getNode();
-                String toName = toLocation.getId().getId();
-                addPath(fromName, toName);
-            }
-        } finally {
-            if (bufferedReader != null) {
-                bufferedReader.close();
-            }
-            if (reader != null) {
-                reader.close();
+    private void parseLocations(Graph locationsGraph) {
+        ArrayList<Graph> locations = locationsGraph.getSubgraphs();
+        for (Graph locationGraph : locations) {
+            Node locationDetails = locationGraph.getNodes(false).get(0);
+            String locationName = locationDetails.getId().getId();
+            String locationDescription = locationDetails.getAttribute("description");
+
+            addLocation(locationName, locationDescription);
+            parseSubGraphs(locationGraph, locationName);
+        }
+    }
+
+    private void parseSubGraphs(Graph locationGraph, String locationName) {
+        ArrayList<Graph> subGraphs = locationGraph.getSubgraphs();
+        for (Graph subgraph : subGraphs) {
+            if (subgraph.getId().getId().equals("artefacts")) {
+                parseArtefacts(subgraph, locationName);
+            } else if (subgraph.getId().getId().equals("furniture")) {
+                parseFurniture(subgraph, locationName);
+            } else if (subgraph.getId().getId().equals("characters")) {
+                parseCharacters(subgraph, locationName);
             }
         }
     }
 
-    /*public GameAction getGameAction(String triggerPhrase) {
-        HashSet<GameAction> actionSet = actions.get(triggerPhrase);
-        // 如果不存在这个 triggerPhrase 对应的动作集合，则返回 null
-        if (actionSet == null || actionSet.isEmpty()) {
-            return null;
+    private void parseArtefacts(Graph subgraph, String locationName) {
+        ArrayList<Node> artefactsNodes = subgraph.getNodes(false);
+        for (Node artefactNode : artefactsNodes) {
+            String artefactName = artefactNode.getId().getId();
+            String artefactDescription = artefactNode.getAttribute("description");
+            addArtefact(locationName, artefactName, artefactDescription);
         }
-        return actionSet.iterator().next();//返回第一个动作对象
-    }*/
+    }
+
+    private void parseFurniture(Graph subgraph, String locationName) {
+        ArrayList<Node> furnitureNodes = subgraph.getNodes(false);
+        for (Node furnitureNode : furnitureNodes) {
+            String furnitureName = furnitureNode.getId().getId();
+            String furnitureDescription = furnitureNode.getAttribute("description");
+            addFurniture(locationName, furnitureName, furnitureDescription);
+        }
+    }
+
+    private void parseCharacters(Graph subgraph, String locationName) {
+        ArrayList<Node> charactersNodes = subgraph.getNodes(false);
+        for (Node charactersNode : charactersNodes) {
+            String charactersName = charactersNode.getId().getId();
+            String charactersDescription = charactersNode.getAttribute("description");
+            addCharacter(locationName, charactersName, charactersDescription);
+        }
+    }
+
+    private String getFirstLocationName(Graph locationsGraph) {
+        Node firstLocationDetails = locationsGraph.getSubgraphs().get(0).getNodes(false).get(0);
+        return firstLocationDetails.getId().getId();
+    }
+
+    private void parsePaths(Graph pathsGraph) {
+        ArrayList<Edge> paths = pathsGraph.getEdges();
+        for (Edge path : paths) {
+            Node fromLocation = path.getSource().getNode();
+            String fromName = fromLocation.getId().getId();
+            Node toLocation = path.getTarget().getNode();
+            String toName = toLocation.getId().getId();
+            addPath(fromName, toName);
+        }
+    }
+
+    // Get actions
     public HashSet<GameAction> getGameActions(String triggerKeyphrase) {
         return actions.get(triggerKeyphrase);
     }
@@ -209,6 +207,7 @@ public class GameData {
         return actions;
     }
 
+    // Parse & store game actions data
     public void parseActionsFromFile(String filePath) throws ParserConfigurationException, SAXException, IOException {
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -216,71 +215,45 @@ public class GameData {
             Element root = document.getDocumentElement();
             NodeList actionNodes = root.getChildNodes();
             for (int i = 0; i < actionNodes.getLength(); i++) {
-                if(i % 2 != 0) {
+                if (i % 2 != 0) {
                     Element actionElement = (Element) actionNodes.item(i);
 
-                    Element triggers = (Element) actionElement.getElementsByTagName("triggers").item(0);
-                    NodeList triggerNodes = triggers.getChildNodes();
-                    List<String> triggerKeyphrases = new ArrayList<>();
-                    for (int j = 0 ; j < triggerNodes.getLength(); j++){
-                        if(j % 2 != 0) {
-                            triggerKeyphrases.add(triggerNodes.item(j).getTextContent());
-                        }
-                    }
-                    /*for (String phrase : triggerKeyphrases) {
-                        System.out.println(phrase);
-                    }*/
-                    Element subjects = (Element) actionElement.getElementsByTagName("subjects").item(0);
-                    NodeList subjectNodes = subjects.getChildNodes();
-                    List<String> subjectEntities = new ArrayList<>();
-                    for (int j = 0 ; j < subjectNodes.getLength(); j++){
-                        if(j % 2 != 0) {
-                            subjectEntities.add(subjectNodes.item(j).getTextContent());
-                        }
-                    }
-                    /*for (String phrase : subjectEntities) {
-                        System.out.println(phrase);
-                    }*/
-                    Element consumed = (Element) actionElement.getElementsByTagName("consumed").item(0);
-                    NodeList consumedNodes = consumed.getChildNodes();
-                    List<String> consumedEntities = new ArrayList<>();
-                    for (int j = 0 ; j < consumedNodes.getLength(); j++){
-                        if(j % 2 != 0) {
-                            consumedEntities.add(consumedNodes.item(j).getTextContent());
-                        }
-                    }
-                    /*for (String phrase : consumedEntities) {
-                        System.out.println(phrase);
-                    }*/
-                    Element produced = (Element) actionElement.getElementsByTagName("produced").item(0);
-                    NodeList producedNodes = produced.getChildNodes();
-                    List<String> producedEntities = new ArrayList<>();
-                    for (int j = 0 ; j < producedNodes.getLength(); j++){
-                        if(j % 2 != 0) {
-                            producedEntities.add(producedNodes.item(j).getTextContent());
-                        }
-                    }
-                    /*for (String phrase : producedEntities) {
-                        System.out.println(phrase);
-                    }*/
+                    List<String> triggerKeyphrases = parseElements(actionElement, "triggers");
+                    List<String> subjectEntities = parseElements(actionElement, "subjects");
+                    List<String> consumedEntities = parseElements(actionElement, "consumed");
+                    List<String> producedEntities = parseElements(actionElement, "produced");
+
                     String narration = actionElement.getElementsByTagName("narration").item(0).getTextContent();
-                    //System.out.println(narration);
 
-                    //store actions triggers
                     GameAction gameAction = new GameAction(triggerKeyphrases, subjectEntities, consumedEntities, producedEntities, narration);
-                    // Add the action to actions map
-                    for (String trigger : triggerKeyphrases) {
-                        if (!actions.containsKey(trigger)) {
-                            actions.put(trigger, new HashSet<>());
-                        }
-                        actions.get(trigger).add(gameAction);
-                    }
+                    storeGameAction(triggerKeyphrases, gameAction);
                 }
-
             }
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
             throw e; // Re-throwing the caught exception
         }
     }
+
+    private List<String> parseElements(Element parentElement, String tagName) {
+        Element element = (Element) parentElement.getElementsByTagName(tagName).item(0);
+        NodeList nodes = element.getChildNodes();
+        List<String> elements = new ArrayList<>();
+        for (int j = 0; j < nodes.getLength(); j++) {
+            if (j % 2 != 0) {
+                elements.add(nodes.item(j).getTextContent());
+            }
+        }
+        return elements;
+    }
+
+    private void storeGameAction(List<String> triggerKeyphrases, GameAction gameAction) {
+        for (String trigger : triggerKeyphrases) {
+            if (!actions.containsKey(trigger)) {
+                actions.put(trigger, new HashSet<>());
+            }
+            actions.get(trigger).add(gameAction);
+        }
+    }
+
 }
