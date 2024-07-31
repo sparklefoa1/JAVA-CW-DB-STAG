@@ -151,22 +151,41 @@ public final class GameServer {
     }
 
     private void produceEntities(GameAction action) {
-        List<String> actionProduceds = action.getProducedEntities();
-        Map<String, List<String>> elementLists = getElementLists();
-        Map<String, List<String>> containsInLists = getContainsInLists(actionProduceds, elementLists);
+        List<String> actionProduced = action.getProducedEntities();
         Locations currentLocation = gameData.getPlayer().getCurrentLocation();
         Locations storeroom = gameData.getLocation("storeroom");
 
-        for (Map.Entry<String, List<String>> entry : containsInLists.entrySet()) {
-            List<String> produced = entry.getValue();
-            String key = entry.getKey();
-            if (produced.contains("locations")) {
-                addLocationPaths(key);
+        for (String entityName : actionProduced) {
+            // Handle artefacts
+            Artefacts artefact = storeroom.getArtefacts(entityName);
+            if (artefact != null) {
+                currentLocation.addArtefact(artefact.getName(), artefact.getDescription());
+                storeroom.getAllArtefacts().remove(entityName);
+                continue;
             }
-            if (produced.contains("storeroom")) {
-                moveProducedEntities(storeroom, currentLocation, key);
+
+            // Handle furniture
+            Furniture furniture = storeroom.getFurniture(entityName);
+            if (furniture != null) {
+                currentLocation.addFurniture(furniture.getName(), furniture.getDescription());
+                storeroom.getAllFurniture().remove(entityName);
+                continue;
             }
-            if (produced.contains("health")) {
+
+            // Handle characters
+            Characters character = storeroom.getCharacters(entityName);
+            if (character != null) {
+                currentLocation.addCharacter(character.getName(), character.getDescription());
+                storeroom.getAllCharacters().remove(entityName);
+            }
+
+            // Handle location paths (if any)
+            if (gameData.getLocation(entityName) != null) {
+                addLocationPaths(entityName);
+            }
+
+            // Handle health recovery
+            if ("health".equals(entityName)) {
                 gameData.getPlayer().setHealth(true);
             }
         }
@@ -252,26 +271,6 @@ public final class GameServer {
     private void addLocationPaths(String path) {
         Locations currentLocation = gameData.getPlayer().getCurrentLocation();
         gameData.addPath(currentLocation.getName(), path);
-    }
-
-    private void moveProducedEntities(Locations fromLocation, Locations toLocation, String entityName) {
-        Artefacts artefact = fromLocation.getArtefacts(entityName);
-        if (artefact != null) {
-            toLocation.addArtefact(artefact.getName(), artefact.getDescription());
-            fromLocation.getAllArtefacts().remove(entityName);
-        }
-
-        Furniture furniture = fromLocation.getFurniture(entityName);
-        if (furniture != null) {
-            toLocation.addFurniture(furniture.getName(), furniture.getDescription());
-            fromLocation.getAllFurniture().remove(entityName);
-        }
-
-        Characters character = fromLocation.getCharacters(entityName);
-        if (character != null) {
-            toLocation.addCharacter(character.getName(), character.getDescription());
-            fromLocation.getAllCharacters().remove(entityName);
-        }
     }
 
     // Check basic commands

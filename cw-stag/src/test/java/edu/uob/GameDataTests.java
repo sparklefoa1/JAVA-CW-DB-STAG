@@ -31,7 +31,7 @@ public class GameDataTests {
         Artefacts artefact = new Artefacts("axe", "A razor sharp axe");
         parseLocation.getPlayer().getCarryList().addArtefact(artefactName, String.valueOf(artefact));
         parseLocation.getPlayer().getCurrentLocation().getAllArtefacts().remove(artefactName);
-        //System.out.println(parseLocation.getPlayer().getStoreroom().getAllArtefacts());
+        //System.out.println(parseLocation.getLocation("storeroom").getAllArtefacts().toString());
         //System.out.println(parseLocation.getPlayer().getCurrentLocation().getAllArtefacts());
         //System.out.println(parseLocation.getPlayer().getCurrentLocation().getAllCharacters());
         //System.out.println(parseLocation.getPlayer().getCurrentLocation().getName());
