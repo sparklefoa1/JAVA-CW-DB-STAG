@@ -11,8 +11,8 @@ public class GamePlayer {
         initial = null;
     }
 
-    public void setHealth(Boolean guess) {
-        if (guess) {
+    public void changeHealth(Boolean increment) {
+        if (increment) {
             if (this.health < 3) {
                 this.health++;
             }
@@ -21,6 +21,10 @@ public class GamePlayer {
                 this.health--;
             }
         }
+    }
+
+    public void resetHealth() {
+        this.health = 3;
     }
 
     public int getHealth(){

@@ -8,10 +8,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public final class GameServer {
 
@@ -65,26 +63,35 @@ public final class GameServer {
     public String handleCommand(String command) {
         // TODO implement your server logic here
         command = command.toLowerCase();
+
         // Give response
-        // Basic commands
+        // Handle basic commands
         String result = handleBasicCommand(command);
         if(!result.equalsIgnoreCase("Not basic command")) {
+            if (gameData.getPlayer().getHealth() == 0) {
+                return gameData.gameOver();
+            }
             return result;
         }
-        // Other actions command
+
+        // Handle other actions command
         HashMap<String, HashSet<GameAction>> gameActions = gameData.getAllActions();
         for (HashMap.Entry<String, HashSet<GameAction>> entry : gameActions.entrySet()) {
             String trigger = entry.getKey();
-            //HashSet<GameAction> actions = entry.getValue();
             if(command.contains(trigger)){
                 String actionResult = checkActionMatch(trigger);
+                if (gameData.getPlayer().getHealth() == 0) {
+                    return gameData.gameOver();
+                }
                 return actionResult;
             }
         }
+
         // Health command
         if(command.contains("health")){
             return "Your current health level is: " + Integer.toString(gameData.getPlayer().getHealth());
         }
+
         return "Invalid command";
     }
 
@@ -100,6 +107,10 @@ public final class GameServer {
                         produceEntities(action);
                         narration = action.getNarration();
                     } else {
+                        // Check if the health reached 0
+                        if (gameData.getPlayer().getHealth() == 0) {
+                            return gameData.gameOver();
+                        }
                         return "Missing consumed entities";
                     }
                 } else {
@@ -141,8 +152,8 @@ public final class GameServer {
                 removeCarryListArtefacts(key);
             }
             if (consumed.contains("health")) {
-                gameData.getPlayer().setHealth(false);
-                if (gameData.gameOver().contains("died")) {
+                gameData.getPlayer().changeHealth(false);
+                if (gameData.getPlayer().getHealth() == 0) {
                     return false;
                 }
             }
@@ -186,7 +197,7 @@ public final class GameServer {
 
             // Handle health recovery
             if ("health".equals(entityName)) {
-                gameData.getPlayer().setHealth(true);
+                gameData.getPlayer().changeHealth(true);
             }
         }
     }

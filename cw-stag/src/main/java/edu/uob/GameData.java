@@ -31,16 +31,21 @@ public class GameData {
 
     public String gameOver() {
         if (player.getHealth() == 0) {
+            // Drop all items at the current location
             Map<String, Artefacts> carryListArtefacts = player.getCarryList().getAllArtefacts();
             for (Map.Entry<String, Artefacts> entry : carryListArtefacts.entrySet()) {
                 Artefacts artefact = entry.getValue();
                 player.getCurrentLocation().addArtefact(artefact.getName(), artefact.getDescription());
             }
-            carryListArtefacts.clear();
+            carryListArtefacts.clear(); // Clear player's carry list
+
+            player.resetHealth();
             Locations initialLocation = player.getInitial();
             player.setCurrentLocation(initialLocation);
+
             return "You died and lost all of your items, you must return to the start of the game";
         }
+
         return "You are alive";
     }
 
