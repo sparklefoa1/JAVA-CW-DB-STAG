@@ -63,35 +63,102 @@ public final class GameServer {
     public String handleCommand(String command) {
         // TODO implement your server logic here
         command = command.toLowerCase();
+        boolean actionFlag = false;
+        boolean basicCommandFlag = false;
 
         // Give response
-        // Handle basic commands
-        String result = handleBasicCommand(command);
-        if(!result.equalsIgnoreCase("Not basic command")) {
-            if (gameData.getPlayer().getHealth() == 0) {
-                return gameData.gameOver();
-            }
-            return result;
-        }
-
-        // Handle other actions command
-        HashMap<String, HashSet<GameAction>> gameActions = gameData.getAllActions();
-        for (HashMap.Entry<String, HashSet<GameAction>> entry : gameActions.entrySet()) {
-            String trigger = entry.getKey();
-            if(command.contains(trigger)){
-                String actionResult = checkActionMatch(trigger);
-                if (gameData.getPlayer().getHealth() == 0) {
-                    return gameData.gameOver();
-                }
-                return actionResult;
-            }
-        }
-
         // Health command
         if(command.contains("health")){
             return "Your current health level is: " + Integer.toString(gameData.getPlayer().getHealth());
         }
 
+        // Check compound commands
+        HashMap<String, HashSet<GameAction>> gameActions = gameData.getAllActions();
+        for (HashMap.Entry<String, HashSet<GameAction>> entry : gameActions.entrySet()) {
+            String trigger = entry.getKey();
+            if (command.contains(trigger)) {
+                actionFlag = true;
+            }
+        }
+        if (!actionFlag) {
+            // Handle basic commands
+            String result = handleBasicCommand(command);
+            if (!result.equalsIgnoreCase("Not basic command") && !result.equalsIgnoreCase("Compound Commands")) {
+                if (gameData.getPlayer().getHealth() == 0) {
+                    return gameData.gameOver();
+                }
+                return result;
+            }
+        }
+
+        // Check compound commands
+        if (command.contains(CMD_INV)
+                || command.contains(CMD_INVENTORY)
+                || command.contains(CMD_GET)
+                || command.contains(CMD_DROP)
+                || command.contains(CMD_GOTO)
+                || command.contains(CMD_LOOK)) {
+            basicCommandFlag = true;
+        }
+        if (!basicCommandFlag) {
+            // Handle other actions command
+            for (HashMap.Entry<String, HashSet<GameAction>> entry : gameActions.entrySet()) {
+                String trigger = entry.getKey();
+
+                // Calculate entities number
+                int artefactNumber = 0;
+                Map<String, Artefacts> currentAllArtefacts = gameData.getPlayer().getCurrentLocation().getAllArtefacts();
+                for (String artefactName : currentAllArtefacts.keySet()) {
+                    artefactNumber = checkCommand(artefactNumber, command, artefactName);
+                }
+                // and carry list
+                int carryArtefactNumber = 0;
+                Map<String, Artefacts> carryListArtefacts = gameData.getPlayer().getCarryList().getAllArtefacts();
+                for (String carryArtefactName : carryListArtefacts.keySet()) {
+                    carryArtefactNumber = checkCommand(carryArtefactNumber, command, carryArtefactName);
+                }
+                int furnitureNumber = 0;
+                Map<String, Furniture> currentAllFurniture = gameData.getPlayer().getCurrentLocation().getAllFurniture();
+                for (String furnitureName : currentAllFurniture.keySet()) {
+                    furnitureNumber = checkCommand(furnitureNumber, command, furnitureName);
+                }
+                int characterNumber = 0;
+                Map<String, Characters> currentAllCharacters = gameData.getPlayer().getCurrentLocation().getAllCharacters();
+                for (String charactersName : currentAllCharacters.keySet()) {
+                    characterNumber = checkCommand(characterNumber, command, charactersName);
+                }
+                int pathNumber = 0;
+                Locations currentLocation = gameData.getPlayer().getCurrentLocation();
+                List<String> currentPath = gameData.getPaths(currentLocation.getName());
+                for (String path : currentPath) {
+                    pathNumber = checkCommand(pathNumber, command, path);
+                }
+                pathNumber = checkCommand(pathNumber, command, currentLocation.getName());
+                int allThingsNumber = artefactNumber + carryArtefactNumber + furnitureNumber + characterNumber;
+                // Handle other actions command
+                if (command.contains(trigger)) {
+                    if (artefactNumber < 2 && carryArtefactNumber < 2 && furnitureNumber < 2 && characterNumber < 2) {
+                        if (pathNumber == 1 && allThingsNumber == 0) {
+                            String actionResult = checkActionMatch(trigger);
+                            if (gameData.getPlayer().getHealth() == 0) {
+                                return gameData.gameOver();
+                            }
+                            return actionResult;
+                        } else if (pathNumber == 0 && allThingsNumber > 0) {
+                            String actionResult = checkActionMatch(trigger);
+                            if (gameData.getPlayer().getHealth() == 0) {
+                                return gameData.gameOver();
+                            }
+                            return actionResult;
+                        } else {
+                            return "Redundant Entities or Compound Commands or Missing entities";
+                        }
+                    }else {
+                        return "Redundant Entities";
+                    }
+                }
+            }
+        }
         return "Invalid command";
     }
 
@@ -299,22 +366,32 @@ public final class GameServer {
 
     public String handleBasicCommand(String command) {
         int n = 0;
-        if (containsAny(command, CMD_INVENTORY, CMD_INV)) {
-            return handleInventory();
+        n = checkCommand(n, command, CMD_INVENTORY)
+                + checkCommand(n, command, CMD_INV)
+                + checkCommand(n, command, CMD_GET)
+                + checkCommand(n, command, CMD_DROP)
+                + checkCommand(n, command, CMD_GOTO)
+                + checkCommand(n, command, CMD_LOOK);
+        if (n == 1 ) {
+            if (containsAny(command, CMD_INVENTORY, CMD_INV)) {
+                return handleInventory();
+            }
+            if (command.contains(CMD_GET)) {
+                return handleGet(command);
+            }
+            if (command.contains(CMD_DROP)) {
+                return handleDrop(command);
+            }
+            if (command.contains(CMD_GOTO)) {
+                return handleGoto(command);
+            }
+            if (command.contains(CMD_LOOK)) {
+                return handleLook();
+            }
+            return "Not basic command";
+        } else {
+            return "Compound Commands";
         }
-        if (command.contains(CMD_GET)) {
-            return handleGet(command);
-        }
-        if (command.contains(CMD_DROP)) {
-            return handleDrop(command);
-        }
-        if (command.contains(CMD_GOTO)) {
-            return handleGoto(command);
-        }
-        if (command.contains(CMD_LOOK)) {
-            return handleLook();
-        }
-        return "Not basic command";
     }
 
     // Check whether it is an inventory built-in command

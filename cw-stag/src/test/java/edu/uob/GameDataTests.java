@@ -51,14 +51,5 @@ public class GameDataTests {
             System.out.println("Narration: " + actions.iterator().next().getNarration());
             System.out.println("---------");
         }
-
-        //HashSet<GameAction> openAction = parseLocation.getGameActions("cut");
-        /*for (GameAction gameAction : openAction) {
-            // 获取当前 GameAction 对象的 subjects
-            List<String> subjects = gameAction.getSubjectEntities();
-            for (String subject : subjects) {
-                System.out.println(subject);
-            }
-        }*/
     }
 }

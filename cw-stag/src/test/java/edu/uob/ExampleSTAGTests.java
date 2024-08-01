@@ -65,5 +65,16 @@ class ExampleSTAGTests {
   }
 
   // Add more unit tests or integration tests here.
+  @Test
+  void testHandleCommand()
+  {
+      sendCommandToServer("simon: get axe");
+      sendCommandToServer("simon: get potion");
+      sendCommandToServer("simon: goto forest");
+      sendCommandToServer("simon: get key from forest");
+      String response = sendCommandToServer("simon: drink potion");
+      response = response.toLowerCase();
+      assertTrue(response.contains("health improves"), "Failed");
+  }
 
 }
