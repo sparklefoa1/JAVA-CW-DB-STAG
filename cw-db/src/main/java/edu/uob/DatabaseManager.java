@@ -529,17 +529,24 @@ public class DatabaseManager {
                         return "[ERROR]: Cannot update ID column";
                     }
 
-                    Cell cell = row.getCells().stream()
-                            .filter(c -> c.getColumnName().equals(update.getKey()))
-                            .findFirst()
-                            .orElse(null);
+                    // Get cell needed to be updated
+                    Cell cell = null;
+                    for (Cell c : row.getCells()) {
+                        if (c.getColumnName().equals(update.getKey())) {
+                            cell = c;
+                            break;
+                        }
+                    }
                     if (cell != null) {
                         cell.setValue(update.getValue());
                         // Updating column type
-                        Column column = table.getColumns().stream()
-                                .filter(c -> c.getName().equals(update.getKey()))
-                                .findFirst()
-                                .orElse(null);
+                        Column column = null;
+                        for (Column c : table.getColumns()) {
+                            if (c.getName().equals(update.getKey())) {
+                                column = c;
+                                break;
+                            }
+                        }
                         if (column != null) {
                             column.setDataType(inferDataType(update.getValue()));
                         }
