@@ -122,9 +122,9 @@ public class GameData {
     }
 
     // Parse & store game entities data
-    public void parseGameEntitiesFromFile(String filePath) throws IOException, ParseException {
+    public void parseGameEntitiesFromFile(File file) throws IOException, ParseException {
         Parser parser = new Parser();
-        try (FileReader reader = new FileReader(filePath); BufferedReader bufferedReader = new BufferedReader(reader)) {
+        try (FileReader reader = new FileReader(file); BufferedReader bufferedReader = new BufferedReader(reader)) {
             parser.parse(reader);
             Graph wholeDocument = parser.getGraphs().get(0);
             ArrayList<Graph> sections = wholeDocument.getSubgraphs();
@@ -213,10 +213,10 @@ public class GameData {
     }
 
     // Parse & store game actions data
-    public void parseActionsFromFile(String filePath) throws ParserConfigurationException, SAXException, IOException {
+    public void parseActionsFromFile(File file) throws ParserConfigurationException, SAXException, IOException {
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document document = builder.parse(filePath);
+            Document document = builder.parse(file);
             Element root = document.getDocumentElement();
             NodeList actionNodes = root.getChildNodes();
             for (int i = 0; i < actionNodes.getLength(); i++) {

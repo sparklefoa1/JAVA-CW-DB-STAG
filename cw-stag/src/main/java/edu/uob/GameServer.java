@@ -44,13 +44,10 @@ public final class GameServer {
         // Initialize game & load game data
         gameData = new GameData();
         try {
-            String entitiesFilePath = entitiesFile.getAbsolutePath();
-            String actionsFilePath = actionsFile.getAbsolutePath();
-            gameData.parseGameEntitiesFromFile(entitiesFilePath);
-            gameData.parseActionsFromFile(actionsFilePath);
+            gameData.parseGameEntitiesFromFile(entitiesFile);
+            gameData.parseActionsFromFile(actionsFile);
         } catch (Exception e) {
             throw new RuntimeException();
-            //e.printStackTrace();
         }
     }
 

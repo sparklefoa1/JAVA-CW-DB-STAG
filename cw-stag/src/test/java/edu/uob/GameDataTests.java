@@ -25,8 +25,8 @@ public class GameDataTests {
 
     @Test
     void testParseLocations() throws IOException, ParseException, ParserConfigurationException, SAXException {
-        String filePath = "config" + File.separator + "basic-entities.dot";
-        parseLocation.parseGameEntitiesFromFile(filePath);
+        File entitiesFile = Paths.get("config" + File.separator + "basic-entities.dot").toAbsolutePath().toFile();
+        parseLocation.parseGameEntitiesFromFile(entitiesFile);
         String artefactName = "axe";
         Artefacts artefact = new Artefacts("axe", "A razor sharp axe");
         parseLocation.getPlayer().getCarryList().addArtefact(artefactName, String.valueOf(artefact));
@@ -36,8 +36,8 @@ public class GameDataTests {
         //System.out.println(parseLocation.getPlayer().getCurrentLocation().getAllCharacters());
         //System.out.println(parseLocation.getPlayer().getCurrentLocation().getName());
         //System.out.println(parseLocation.getLocation("cabin").getDescription());
-        String actionFilePath = "config" + File.separator + "basic-actions.xml";
-        parseLocation.parseActionsFromFile(actionFilePath);
+        File actionsFile = Paths.get("config" + File.separator + "basic-actions.xml").toAbsolutePath().toFile();
+        parseLocation.parseActionsFromFile(actionsFile);
         HashMap<String, HashSet<GameAction>> gameActions = new HashMap<>();
         gameActions = parseLocation.getAllActions();
         // 遍历 HashMap 的键值对
